@@ -1,23 +1,43 @@
-import logo from './logo.svg';
 import './App.css';
-
+import React, { useState } from 'react';
+import { HashRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Login from './components/Login.jsx';
+import Home from './components/Home.jsx';
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+  };
+  const handleLogOut = () => {
+    setIsAuthenticated(false);
+
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Router>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/home" replace />
+              ) : (
+                <Login onLoginSuccess={handleLoginSuccess} />
+              )
+            }
+          />
+          <Route
+            path="/home/*"
+            element={
+              isAuthenticated ? (
+                <Home handleLogOut={handleLogOut} />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+        </Routes>
+      </Router>
     </div>
   );
 }

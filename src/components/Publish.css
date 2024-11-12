@@ -1,0 +1,48 @@
+/* Publish.css */
+.publish-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.header-container {
+    padding: 10px;
+    font-size: "2em";
+    background-color: #f8f9fa;
+}
+
+.vant-tabs__nav {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.vant-tabs__nav-item {
+    font-size: 16px;
+    padding: 10px 15px;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.3s, background-color 0.3s;
+}
+
+.vant-tabs__nav-item--active {
+    font-weight: bold;
+    color: #008c8c;
+    /* 选中的标签颜色 */
+    background: linear-gradient(to right, #a2facf, #64acff);
+    border-radius: 20px;
+    padding: 10px 20px;
+}
+
+.vant-tabs__nav-item:hover {
+    color: #008c8c;
+    /* 鼠标悬停时标签的颜色 */
+}
+
+.body-container {
+    padding: 20px;
+    flex: 1;
+    background-color: #fff;
+    margin-bottom: 10%;
+}

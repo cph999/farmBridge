@@ -1,27 +1,29 @@
-import React, { useState } from "react";
-import { Tabbar } from 'react-vant';
-import { HomeO, Search, FriendsO, SettingO } from '@react-vant/icons';
+import React, {useState} from "react";
+import {Tabbar} from 'react-vant';
+import {HomeO, Search, FriendsO, SettingO} from '@react-vant/icons';
 import Trade from "./Trade.jsx";
 import Chat from "./Chat.jsx";
 import Profile from "./Profile.jsx";
 import Publish from "./Publish.jsx";
-const Home = () => {
+import LocalStorageUtil from "../utils/LocalStorageUtil";
+
+const Home = ({websocket}) => {
 
     const [activeTab, setActiveTab] = useState('home');
-    const [userinfo, setUserinfo] = useState({}); // 定义一个 state 变量存储用户名
+    const [userinfo, setUserinfo] = useState(LocalStorageUtil.getItem("userinfo")); // 定义一个 state 变量存储用户名
 
     const renderContent = () => {
         switch (activeTab) {
             case 'publish':
-                return <Publish />;
+                return <Publish/>;
             case 'trade':
-                return <Trade userinfo={userinfo} />;
+                return <Trade userinfo={userinfo}/>;
             case 'chat':
-                return <Chat userinfo={userinfo} />;
+                return <Chat userinfo={userinfo} websocket={websocket}/>;
             case 'profile':
-                return <Profile userinfo={userinfo} setUserinfox={setUserinfo} />;
+                return <Profile userinfo={userinfo} setUserinfox={setUserinfo}/>;
             default:
-                return <Publish />;
+                return <Publish/>;
 
         }
     };
@@ -30,16 +32,16 @@ const Home = () => {
         <div>
             {renderContent()}
             <Tabbar active={activeTab} onChange={setActiveTab}>
-                <Tabbar.Item icon={<HomeO />} name="publish">
+                <Tabbar.Item icon={<HomeO/>} name="publish">
                     首页
                 </Tabbar.Item>
-                <Tabbar.Item icon={<Search />} name="trade" badge={{ dot: true }}>
+                <Tabbar.Item icon={<Search/>} name="trade" badge={{dot: true}}>
                     商城
                 </Tabbar.Item>
-                <Tabbar.Item icon={<FriendsO />} name="chat" badge={{ content: 5 }}>
+                <Tabbar.Item icon={<FriendsO/>} name="chat" badge={{content: 5}}>
                     聊天
                 </Tabbar.Item>
-                <Tabbar.Item icon={<SettingO />} name="profile">
+                <Tabbar.Item icon={<SettingO/>} name="profile">
                     我的
                 </Tabbar.Item>
             </Tabbar>

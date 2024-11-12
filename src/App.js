@@ -4,118 +4,113 @@ import { HashRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
 import Login from './components/Login.jsx';
 import Home from './components/Home.jsx';
 import LocalStorageUtil from './utils/LocalStorageUtil.js';
+import PostDetail from './components/PostDetail.jsx';
+import Chat from './components/Chat.jsx';
+
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const websocketRef = useRef(null);
-  const [userinfo, setUserinfo] = useState({})
-  const handleLoginSuccess = () => {
-    const u = LocalStorageUtil.getItem("userinfo")
-    // const ws = new WebSocket(`wss://localhost:8809/chat?userId=${useri}`);
-    if (u != null && u !== undefined && JSON.stringify(u) !== '{}') {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const websocketRef = useRef(null);  // 使用 useRef 存储 WebSocket 实例
+    const [userinfo, setUserinfo] = useState({});
 
-      const ws = new WebSocket(`ws://localhost:8809/chat?userId=${u.id}`);
+    const handleLoginSuccess = () => {
+        const u = LocalStorageUtil.getItem("userinfo");
+        setIsAuthenticated(true);
 
-      ws.onopen = () => {
-        console.log('WebSocket connected');
-      };
+        if (u != null && u !== undefined && JSON.stringify(u) !== '{}') {
+            // 创建 WebSocket 实例
+            const wsInstance = new WebSocket(`ws://localhost:8809/chat?userId=${u.id}`);
 
-      ws.onmessage = (event) => {
+            wsInstance.onopen = () => {
+                console.log('WebSocket connected');
+            };
 
-      };
+            wsInstance.onerror = (error) => {
+                console.log('WebSocket error:', error);
+            };
 
-      ws.onerror = (error) => {
-        console.log('WebSocket error:', error);
-      };
+            wsInstance.onclose = () => {
+                console.log('WebSocket disconnected');
+            };
 
-      ws.onclose = () => {
-        console.log('WebSocket disconnected');
-      };
+            // 将 WebSocket 实例存储在 websocketRef 中
+            websocketRef.current = wsInstance;
 
-      websocketRef.current = ws;
-
-      return () => {
-        if (ws) {
-          ws.close();
+            // 确保在组件卸载时关闭 WebSocket
+            return () => {
+                if (wsInstance) {
+                    wsInstance.close();
+                }
+            };
         }
-      };
-    }
-    setIsAuthenticated(true);
-  };
-  const handleLogOut = () => {
-    setIsAuthenticated(false);
+    };
 
-  }
-
-  useEffect(() => {
-    if (userinfo !== undefined && userinfo !== null && JSON.stringify(userinfo) !== '{}') {
-      setIsAuthenticated(true)
-    }
-  }, [userinfo]);
-
-
-  useEffect(() => {
-    setUserinfo(LocalStorageUtil.getItem("userinfo"))
-    const u = LocalStorageUtil.getItem("userinfo")
-    // const ws = new WebSocket(`wss://localhost:8809/chat?userId=${useri}`);
-    if (u != null && u !== undefined && JSON.stringify(u) !== '{}') {
-
-      const ws = new WebSocket(`ws://localhost:8809/chat?userId=${u.id}`);
-
-      ws.onopen = () => {
-        console.log('WebSocket connected');
-      };
-
-      ws.onmessage = (event) => {
-
-      };
-
-      ws.onerror = (error) => {
-        console.log('WebSocket error:', error);
-      };
-
-      ws.onclose = () => {
-        console.log('WebSocket disconnected');
-      };
-
-      websocketRef.current = ws;
-
-      return () => {
-        if (ws) {
-          ws.close();
+    const handleLogOut = () => {
+        setIsAuthenticated(false);
+        if (websocketRef.current) {
+            websocketRef.current.close(); // 用户登出时关闭 WebSocket 连接
+            websocketRef.current = null;
         }
-      };
-    }
-  }, []);
+    };
 
+    useEffect(() => {
+        const u = LocalStorageUtil.getItem("userinfo");
+        setUserinfo(u);
+        if (u !== null && u !== undefined && JSON.stringify(u) !== '{}') {
+            const wsInstance = new WebSocket(`ws://localhost:8809/chat?userId=${u.id}`);
 
-  return (
-    <div className="App">
-      <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              isAuthenticated ? (
-                <Navigate to="/home" replace />
-              ) : (
-                <Login onLoginSuccess={handleLoginSuccess} />
-              )
-            }
-          />
-          <Route
-            path="/home/*"
-            element={
-              isAuthenticated ? (
-                <Home handleLogOut={handleLogOut} />
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
-          />
-        </Routes>
-      </Router>
-    </div>
-  );
+            wsInstance.onopen = () => {
+                console.log('WebSocket connected');
+            };
+
+            wsInstance.onerror = (error) => {
+                console.log('WebSocket error:', error);
+            };
+
+            wsInstance.onclose = () => {
+                console.log('WebSocket disconnected');
+            };
+
+            websocketRef.current = wsInstance;
+
+            return () => {
+                if (wsInstance) {
+                    wsInstance.close();
+                }
+            };
+        }
+    }, []);
+
+    return (
+        <div className="App">
+            <Router>
+                <Routes>
+                    <Route
+                        path="/"
+                        element={
+                            isAuthenticated ? (
+                                <Navigate to="/home" replace/>
+                            ) : (
+                                <Login onLoginSuccess={handleLoginSuccess} setUserinfo={setUserinfo}/>
+                            )
+                        }
+                    />
+                    <Route
+                        path="/home/*"
+                        element={
+                            isAuthenticated ? (
+                                <Home handleLogOut={handleLogOut} userinfo={userinfo} websocket={websocketRef.current}/>
+                            ) : (
+                                <Navigate to="/" replace/>
+                            )
+                        }
+                    />
+                    <Route path="/post-detail" element={<PostDetail/>}/>
+                    {/* 将 WebSocket 实例 websocketRef.current 传递给 Chat */}
+                    <Route path="/contact" element={<Chat userinfo={userinfo} websocket={websocketRef.current}/>}/>
+                </Routes>
+            </Router>
+        </div>
+    );
 }
 
 export default App;

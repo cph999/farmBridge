@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import "./Publish.css";
-import { Tabs, Input, Button, Card, Image, Toast, Space, Flex, List, PullRefresh, Swiper } from 'react-vant';
-import { Search, Arrow, PhoneO } from '@react-vant/icons';
-import defaultImaage from "../assets/icon.png"
-
+import {Tabs, Input, Button, Card, Image, Toast, Space, Flex, List, PullRefresh, Swiper} from 'react-vant';
+import {Search, Arrow, PhoneO} from '@react-vant/icons';
+import {useNavigate} from 'react-router-dom';  // 导入 useNavigate
+import defaultImage from "../assets/icon.png";
 import instance from '../utils/api';
 
 const Publish = () => {
+    const navigate = useNavigate();  // 初始化 useNavigate
     const [tabsList] = useState(["全部", "牛", "羊", "猪", "鸭"]);
     const [currentTab, setCurrentTab] = useState(0);
     const [search, setSearch] = useState("");
@@ -16,8 +17,9 @@ const Publish = () => {
     const [finished, setFinished] = useState(false);
     const [isOver, setIsOver] = useState(false);
     const [swpierDatas, setSwpierDatas] = useState([]);
+
     const onLoadRefresh = async (isRefresh) => {
-        if (isOver) return; // 如果已经没有更多数据，直接返回
+        if (isOver) return;
         const nextPage = isRefresh ? 1 : pageNum;
         if (!isRefresh) setPageNum(prev => prev + 1);
 
@@ -25,16 +27,17 @@ const Publish = () => {
         const data = res.data.datas || [];
 
         if (data.length === 0) {
-            setIsOver(true); // 如果没有数据返回，说明没有更多数据
+            setIsOver(true);
             setFinished(true);
         } else {
             setList(prev => isRefresh ? data : [...prev, ...data]);
             if (data.length < pageSize) {
-                setIsOver(true); // 如果数据量小于页大小，表示没有更多数据
+                setIsOver(true);
                 setFinished(true);
             }
         }
     };
+
     const items = swpierDatas.map((item, index) => (
         <Swiper.Item key={index}>
             <div
@@ -63,7 +66,7 @@ const Publish = () => {
                         bottom: '10px',
                         left: '10px',
                         color: '#fff',
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',  // 添加半透明背景，提升文字可读性
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
                         padding: '5px 10px',
                         borderRadius: '5px',
                     }}
@@ -72,9 +75,7 @@ const Publish = () => {
                 </div>
             </div>
         </Swiper.Item>
-
-
-    ))
+    ));
 
     useEffect(() => {
         const fetchSwiperData = () => {
@@ -82,22 +83,21 @@ const Publish = () => {
                 .then(res => {
                     if (res.data.code === 200)
                         setSwpierDatas(res.data.datas);
-                })
-        }
+                });
+        };
         fetchSwiperData();
     }, []);
 
-
     const queryPost = async (page) => {
-        return await instance.post("/getPostList", { search, categoryCode: currentTab, pageNum: page, pageSize });
+        return await instance.post("/getPostList", {search, categoryCode: currentTab, pageNum: page, pageSize});
     };
 
     useEffect(() => {
         const fetchData = async () => {
-            setList([]); // 切换 Tab 时清空列表
-            setIsOver(false); // 重置 isOver 状态
-            setFinished(false); // 重置 finished 状态
-            await onLoadRefresh(true); // 重新加载数据
+            setList([]);
+            setIsOver(false);
+            setFinished(false);
+            await onLoadRefresh(true);
         };
         fetchData();
     }, [currentTab]);
@@ -110,11 +110,16 @@ const Publish = () => {
     };
 
     const handleSearch = async () => {
-        setList([]); // 清空列表
-        setIsOver(false); // 重置 isOver
-        setFinished(false); // 重置 finished
-        setPageNum(1); // 重置页码
-        await onLoadRefresh(true); // 重新加载数据
+        setList([]);
+        setIsOver(false);
+        setFinished(false);
+        setPageNum(1);
+        await onLoadRefresh(true);
+    };
+
+    // 点击卡片跳转
+    const handleCardClick = (item) => {
+        navigate('/post-detail', {state: {item}});  // 携带 item 数据
     };
 
     return (
@@ -124,45 +129,51 @@ const Publish = () => {
                     prefix="💁"
                     value={search}
                     onChange={e => setSearch(e)}
-                    suffix={<Search fontSize="2em" onClick={handleSearch} />}
+                    suffix={<Search fontSize="2em" onClick={handleSearch}/>}
                     placeholder="搜索您感兴趣的品类"
                 />
-                <Tabs onChange={(e) => { setCurrentTab(e); setPageNum(1) }}>
+                <Tabs onChange={(e) => {
+                    setCurrentTab(e);
+                    setPageNum(1);
+                }}>
                     {tabsList.map((item, index) => (
-                        <Tabs.TabPane key={index} title={item} />
+                        <Tabs.TabPane key={index} title={item}/>
                     ))}
                 </Tabs>
             </div>
 
             <div className='body-container'>
                 <div className="swiper-container">
-                    <Swiper autoplay={5000} loop={true}>{items} </Swiper>
+                    <Swiper autoplay={5000} loop={true}>{items}</Swiper>
                 </div>
-                <PullRefresh onRefresh={onRefresh} style={{ marginTop: '10px' }}>
+                <PullRefresh onRefresh={onRefresh} style={{marginTop: '10px'}}>
                     <List finished={finished} onLoad={() => onLoadRefresh(false)}>
                         <Flex wrap="wrap" gutter={20}>
                             {list.map((item, i) => (
                                 <Flex.Item key={i} span={12} className='item-box'>
                                     <Card round>
-                                        <Card.Cover onClick={() => Toast.info('点击了Cover区域')}>
-                                            <Image src={item.images} style={{ width: '100%', height: '15vh', objectFit: 'cover' }} />
+                                        <Card.Cover onClick={() => handleCardClick(item)}>
+                                            <Image src={item.images}
+                                                   style={{width: '100%', height: '15vh', objectFit: 'cover'}}/>
                                         </Card.Cover>
                                         <Card.Header
-                                            extra={<Arrow />}
-                                            onClick={() => Toast.info('点击了Header区域')}
+                                            extra={<Arrow/>}
                                         >
                                             {item.description}
                                         </Card.Header>
-                                        <Card.Body onClick={() => Toast.info('点击了Body区域')}>
+                                        <Card.Body>
                                             {item.locationInfo}
                                         </Card.Body>
                                         <Card.Footer>
                                             <Space>
                                                 <Button
-                                                    icon={<PhoneO />}
+                                                    icon={<PhoneO/>}
                                                     round
                                                     color='linear-gradient(to right, #ff6034, #ee0a24)'
                                                     size='small'
+                                                    onClick={() => {
+                                                        navigate('/contact', {state: {item}});  // 携带 item 数据
+                                                    }}
                                                 >
                                                     在线联系
                                                 </Button>

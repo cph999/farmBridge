@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import "./Publish.css";
-import { Tabs, Input, Button, Card, Image, Toast, Space, Flex, List, PullRefresh } from 'react-vant';
+import { Tabs, Input, Button, Card, Image, Toast, Space, Flex, List, PullRefresh, Swiper } from 'react-vant';
 import { Search, Arrow, PhoneO } from '@react-vant/icons';
+import defaultImaage from "../assets/icon.png"
 
 import instance from '../utils/api';
 
@@ -14,7 +15,7 @@ const Publish = () => {
     const [list, setList] = useState([]);
     const [finished, setFinished] = useState(false);
     const [isOver, setIsOver] = useState(false);
-
+    const [swpierDatas, setSwpierDatas] = useState([]);
     const onLoadRefresh = async (isRefresh) => {
         if (isOver) return; // 如果已经没有更多数据，直接返回
         const nextPage = isRefresh ? 1 : pageNum;
@@ -34,6 +35,58 @@ const Publish = () => {
             }
         }
     };
+    const items = swpierDatas.map((item, index) => (
+        <Swiper.Item key={index}>
+            <div
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    position: 'relative',
+                    overflow: 'hidden',
+                }}
+                onClick={() => {
+                    Toast.info(`你点击了卡片 ${index + 1}`);
+                }}
+            >
+                <Image
+                    src={item.images}
+                    alt="封面图片"
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                    }}
+                />
+                <div
+                    style={{
+                        position: 'absolute',
+                        bottom: '10px',
+                        left: '10px',
+                        color: '#fff',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',  // 添加半透明背景，提升文字可读性
+                        padding: '5px 10px',
+                        borderRadius: '5px',
+                    }}
+                >
+                    {item.description}
+                </div>
+            </div>
+        </Swiper.Item>
+
+
+    ))
+
+    useEffect(() => {
+        const fetchSwiperData = () => {
+            instance.post("/popularData")
+                .then(res => {
+                    if (res.data.code === 200)
+                        setSwpierDatas(res.data.datas);
+                })
+        }
+        fetchSwiperData();
+    }, []);
+
 
     const queryPost = async (page) => {
         return await instance.post("/getPostList", { search, categoryCode: currentTab, pageNum: page, pageSize });
@@ -82,7 +135,10 @@ const Publish = () => {
             </div>
 
             <div className='body-container'>
-                <PullRefresh onRefresh={onRefresh}>
+                <div className="swiper-container">
+                    <Swiper autoplay={5000} loop={true}>{items} </Swiper>
+                </div>
+                <PullRefresh onRefresh={onRefresh} style={{ marginTop: '10px' }}>
                     <List finished={finished} onLoad={() => onLoadRefresh(false)}>
                         <Flex wrap="wrap" gutter={20}>
                             {list.map((item, i) => (

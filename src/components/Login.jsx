@@ -5,6 +5,7 @@ import { Button, Flex, Form, Input, Toast } from 'react-vant';
 import { useState, useEffect } from 'react';
 import { UserO } from '@react-vant/icons';
 import instance from "../utils/api"
+import LocalStorageUtil from "../utils/LocalStorageUtil";
 
 
 const Login = ({ onLoginSuccess }) => {
@@ -30,7 +31,8 @@ const Login = ({ onLoginSuccess }) => {
         }
 
         instance.post("/login", { phone, verificationCode }).then(res => {
-            console.log(res);
+            console.log("userinfo", res.data.data)
+            LocalStorageUtil.setItem("userinfo", res.data.data)
         });
         Toast.success('登录成功');
         onLoginSuccess();

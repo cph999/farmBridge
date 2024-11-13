@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import "./Publish.css";
-import {Tabs, Input, Button, Card, Image, Toast, Space, Flex, List, PullRefresh, Swiper} from 'react-vant';
-import {Search, Arrow, PhoneO} from '@react-vant/icons';
-import {useNavigate} from 'react-router-dom';  // 导入 useNavigate
+import { Tabs, Input, Button, Card, Image, Toast, Space, Flex, List, PullRefresh, Swiper } from 'react-vant';
+import { Search, Arrow, PhoneO } from '@react-vant/icons';
+import { useNavigate } from 'react-router-dom';  // 导入 useNavigate
 import defaultImage from "../assets/icon.png";
 import instance from '../utils/api';
 
-const Publish = () => {
+const Publish = ({ boxMessage, setBoxMessage, sendMessage }) => {
     const navigate = useNavigate();  // 初始化 useNavigate
     const [tabsList] = useState(["全部", "牛", "羊", "猪", "鸭"]);
     const [currentTab, setCurrentTab] = useState(0);
@@ -89,7 +89,7 @@ const Publish = () => {
     }, []);
 
     const queryPost = async (page) => {
-        return await instance.post("/getPostList", {search, categoryCode: currentTab, pageNum: page, pageSize});
+        return await instance.post("/getPostList", { search, categoryCode: currentTab, pageNum: page, pageSize });
     };
 
     useEffect(() => {
@@ -119,7 +119,7 @@ const Publish = () => {
 
     // 点击卡片跳转
     const handleCardClick = (item) => {
-        navigate('/post-detail', {state: {item}});  // 携带 item 数据
+        navigate('/post-detail', { state: { item } });  // 携带 item 数据
     };
 
     return (
@@ -129,7 +129,7 @@ const Publish = () => {
                     prefix="💁"
                     value={search}
                     onChange={e => setSearch(e)}
-                    suffix={<Search fontSize="2em" onClick={handleSearch}/>}
+                    suffix={<Search fontSize="2em" onClick={handleSearch} />}
                     placeholder="搜索您感兴趣的品类"
                 />
                 <Tabs onChange={(e) => {
@@ -137,7 +137,7 @@ const Publish = () => {
                     setPageNum(1);
                 }}>
                     {tabsList.map((item, index) => (
-                        <Tabs.TabPane key={index} title={item}/>
+                        <Tabs.TabPane key={index} title={item} />
                     ))}
                 </Tabs>
             </div>
@@ -146,7 +146,7 @@ const Publish = () => {
                 <div className="swiper-container">
                     <Swiper autoplay={5000} loop={true}>{items}</Swiper>
                 </div>
-                <PullRefresh onRefresh={onRefresh} style={{marginTop: '10px'}}>
+                <PullRefresh onRefresh={onRefresh} style={{ marginTop: '10px' }}>
                     <List finished={finished} onLoad={() => onLoadRefresh(false)}>
                         <Flex wrap="wrap" gutter={20}>
                             {list.map((item, i) => (
@@ -154,10 +154,10 @@ const Publish = () => {
                                     <Card round>
                                         <Card.Cover onClick={() => handleCardClick(item)}>
                                             <Image src={item.images}
-                                                   style={{width: '100%', height: '15vh', objectFit: 'cover'}}/>
+                                                style={{ width: '100%', height: '15vh', objectFit: 'cover' }} />
                                         </Card.Cover>
                                         <Card.Header
-                                            extra={<Arrow/>}
+                                            extra={<Arrow />}
                                         >
                                             {item.description}
                                         </Card.Header>
@@ -167,12 +167,12 @@ const Publish = () => {
                                         <Card.Footer>
                                             <Space>
                                                 <Button
-                                                    icon={<PhoneO/>}
+                                                    icon={<PhoneO />}
                                                     round
                                                     color='linear-gradient(to right, #ff6034, #ee0a24)'
                                                     size='small'
                                                     onClick={() => {
-                                                        navigate('/contact', {state: {item}});  // 携带 item 数据
+                                                        navigate('/contact', { state: { item } });  // 携带 item 数据
                                                     }}
                                                 >
                                                     在线联系

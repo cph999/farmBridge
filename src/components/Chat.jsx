@@ -1,13 +1,13 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {instance} from '../utils/api';
-import {Toast} from 'react-vant';
-import {PullRefresh, List, Cell, Flex, Image, Badge, Popover, Search, NavBar, Button} from 'react-vant';
+import React, { useState, useEffect, useRef } from 'react';
+import { instance } from '../utils/api';
+import { Toast } from 'react-vant';
+import { PullRefresh, List, Cell, Flex, Image, Badge, Popover, Search, NavBar, Button } from 'react-vant';
 import './Chat.css';
 import defaultIcon from '../assets/icon.png';
 import ChatBox from './ChatBox.jsx';
-import {AddO} from '@react-vant/icons';
+import { AddO } from '@react-vant/icons';
 
-function Chat({userinfo, websocket}) {
+function Chat({ userinfo, websocket }) {
     const [messages, setMessages] = useState([]); // 所有消息
     const [finish, setFinish] = useState(false);
     const [boxMessage, setBoxMessage] = useState([]); // 当前对话人的消息
@@ -28,7 +28,7 @@ function Chat({userinfo, websocket}) {
 
         const fetchData = async () => {
             try {
-                const response = await instance.post("/searchUser", {nickname: search, username: search});
+                const response = await instance.post("/searchUser", { nickname: search, username: search });
                 if (response && response.data && response.data.code === 200) {
                     setUserList(response.data.datas);
                 } else {
@@ -48,7 +48,7 @@ function Chat({userinfo, websocket}) {
             ws.onmessage = (event) => {
                 const newMessage = JSON.parse(event.data);
                 let flag = false;
-
+                console.log("newMessage", newMessage)
                 setMessages((prevMessages) => {
                     const updatedMessages = [...prevMessages];
                     const currentBoxMessage = boxMessageRef.current;
@@ -64,6 +64,7 @@ function Chat({userinfo, websocket}) {
                                 const targetId = currentBoxMessage[0].fromId === userinfo.id ? currentBoxMessage[0].toId : currentBoxMessage[0].fromId;
                                 if (newMessage.fromId === targetId || newMessage.toId === targetId) {
                                     setBoxMessage(updatedMessages[i]);
+                                    console.log("updatedMessages", updatedMessages[i])
                                 }
                             }
                             flag = true;
@@ -100,9 +101,9 @@ function Chat({userinfo, websocket}) {
     };
 
     const disabledActions = [
-        {text: '添加好友', disabled: false},
-        {text: '敬请期待', disabled: true},
-        {text: '敬请期待', disabled: true},
+        { text: '添加好友', disabled: false },
+        { text: '敬请期待', disabled: true },
+        { text: '敬请期待', disabled: true },
     ];
 
     const onLoadRefresh = async () => {
@@ -150,7 +151,7 @@ function Chat({userinfo, websocket}) {
 
     const handleSearch = async () => {
         try {
-            const response = await instance.post("/searchUser", {nickname: search, username: search});
+            const response = await instance.post("/searchUser", { nickname: search, username: search });
             if (response && response.data && response.data.code === 200) {
                 setUserList(response.data.datas);
             } else {
@@ -171,18 +172,18 @@ function Chat({userinfo, websocket}) {
                             <Flex.Item span={4} className="badge">
                                 <Badge dot offset={['0%', '100%']} color="#87d068">
                                     <Image round fit='cover' width='100%' height='100%'
-                                           src={(userinfo && userinfo.cover) || defaultIcon}/>
+                                        src={(userinfo && userinfo.cover) || defaultIcon} />
                                 </Badge>
                             </Flex.Item>
                             <Flex.Item span={8} className="nickname-container">
                                 <span className="nickname">{userinfo.nickname}</span>
                             </Flex.Item>
-                            <Flex.Item span={12} style={{textAlign: 'right', marginTop: '15px'}}>
+                            <Flex.Item span={12} style={{ textAlign: 'right', marginTop: '15px' }}>
                                 <Popover
                                     actions={disabledActions}
                                     onSelect={select}
                                     placement="bottom-end"
-                                    reference={<AddO fontSize="1.5em"/>}
+                                    reference={<AddO fontSize="1.5em" />}
                                 />
                             </Flex.Item>
                         </Flex>
@@ -198,7 +199,7 @@ function Chat({userinfo, websocket}) {
                                         label={message[message.length - 1].message}
                                         icon={<img
                                             src={userinfo.id === message[message.length - 1].fromId ? message[message.length - 1].toIcon : message[message.length - 1].fromIcon}
-                                            alt="from" className="cell-icon"/>}
+                                            alt="from" className="cell-icon" />}
                                         value={message[message.length - 1].showTime}
                                         className={userinfo.id === message[message.length - 1].fromId ? "cell-sent" : "cell-received"}
                                         onClick={() => handleClickMessage(message)}
@@ -243,7 +244,7 @@ function Chat({userinfo, websocket}) {
                                     <Flex.Item span={18}>
                                         <Cell
                                             title={user.nickname || user.username}
-                                            icon={<img src={user.cover} alt="from" className="cell-icon"/>}
+                                            icon={<img src={user.cover} alt="from" className="cell-icon" />}
                                             className={"cell-received"}
                                         />
                                     </Flex.Item>

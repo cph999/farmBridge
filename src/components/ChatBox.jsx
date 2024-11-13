@@ -1,18 +1,18 @@
-import React, {useEffect, useState} from "react";
-import {useLocation, useNavigate} from "react-router-dom";
-import {NavBar, List, Button, Space, Toast, Card} from 'react-vant';
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { NavBar, List, Button, Space, Toast, Card } from 'react-vant';
 import ChatItem from './ChatItem.jsx';
 import ChatInput from './ChatInput.jsx';
 import './ChatBox.css';
-import {PhoneO} from '@react-vant/icons';
+import { PhoneO } from '@react-vant/icons';
 
 
-function ChatBox({boxMessage, setChatState, userinfo, sendMessage}) {
+function ChatBox({ boxMessage, setChatState, userinfo, sendMessage }) {
     const location = useLocation();
     const navigate = useNavigate();
 
     // 从 location.state 获取传递的 item 数据
-    const {item} = location.state || {};
+    const { item } = location.state || {};
 
     // 本地的消息列表状态
     const [messages, setMessages] = useState(boxMessage);
@@ -45,8 +45,11 @@ function ChatBox({boxMessage, setChatState, userinfo, sendMessage}) {
 
     // 处理返回按钮点击逻辑
     const handleBack = () => {
-        setChatState(false);
-        navigate(-1);  // 返回上一页
+        if (setChatState === undefined) {
+            navigate("/home");
+        } else {
+            setChatState(false);
+        }
     };
 
     // 如果没有传递 item 数据，展示一个提示信息
@@ -64,11 +67,11 @@ function ChatBox({boxMessage, setChatState, userinfo, sendMessage}) {
             <div className='message-block'>
                 <List>
                     {messages.map((message, index) => (
-                        <ChatItem key={index} message={message} userinfo={userinfo}/>
+                        <ChatItem key={index} message={message} userinfo={userinfo} />
                     ))}
                 </List>
             </div>
-            <ChatInput onSend={handleSend}/>
+            <ChatInput onSend={handleSend} />
         </div>
     );
 }

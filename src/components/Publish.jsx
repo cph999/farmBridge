@@ -3,7 +3,6 @@ import "./Publish.css";
 import { Tabs, Input, Button, Card, Image, Toast, Space, Flex, List, PullRefresh, Swiper } from 'react-vant';
 import { Search, Arrow, PhoneO } from '@react-vant/icons';
 import { useNavigate } from 'react-router-dom';  // 导入 useNavigate
-import defaultImage from "../assets/icon.png";
 import instance from '../utils/api';
 
 const Publish = ({ boxMessage, setBoxMessage, sendMessage }) => {
@@ -122,6 +121,11 @@ const Publish = ({ boxMessage, setBoxMessage, sendMessage }) => {
         navigate('/post-detail', { state: { item } });  // 携带 item 数据
     };
 
+    const handleContractClick = async (item) => {
+        console.log("handleContractClick", item);
+        navigate('/contact', { state: { item } });  // 携带 item 数据
+    }
+
     return (
         <div className='publish-container'>
             <div className='header-container'>
@@ -171,9 +175,7 @@ const Publish = ({ boxMessage, setBoxMessage, sendMessage }) => {
                                                     round
                                                     color='linear-gradient(to right, #ff6034, #ee0a24)'
                                                     size='small'
-                                                    onClick={() => {
-                                                        navigate('/contact', { state: { item } });  // 携带 item 数据
-                                                    }}
+                                                    onClick={() => handleContractClick(item)}  // 使用箭头函数传递 item
                                                 >
                                                     在线联系
                                                 </Button>

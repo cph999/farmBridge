@@ -64,8 +64,8 @@ function App() {
   };
 
   const sendMessage = (message) => {
-    if (websocketRef && websocketRef.readyState === WebSocket.OPEN) {
-      websocketRef.send(JSON.stringify(message));
+    if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
+      websocketRef.current.send(JSON.stringify(message));
     } else {
       Toast.fail('WebSocket未连接');
     }

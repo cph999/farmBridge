@@ -85,7 +85,7 @@ function Chat({ userinfo, websocket }) {
         }
     }, [userinfo, websocket]);
 
-    const sendMessage = (message) => {
+    const sendMessage = (message) => {  
         if (websocket && websocket.readyState === WebSocket.OPEN) {
             websocket.send(JSON.stringify(message));
         } else {

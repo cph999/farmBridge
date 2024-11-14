@@ -5,7 +5,7 @@ import { Search, Arrow, PhoneO } from '@react-vant/icons';
 import { useNavigate } from 'react-router-dom';  // 导入 useNavigate
 import instance from '../utils/api';
 
-const Publish = ({ boxMessage, setBoxMessage, sendMessage }) => {
+const Publish = ({ boxMessage, setBoxMessage, sendMessage, setOrderItem, userinfo }) => {
     const navigate = useNavigate();  // 初始化 useNavigate
     const [tabsList] = useState(["全部", "牛", "羊", "猪", "鸭"]);
     const [currentTab, setCurrentTab] = useState(0);
@@ -122,7 +122,14 @@ const Publish = ({ boxMessage, setBoxMessage, sendMessage }) => {
     };
 
     const handleContractClick = async (item) => {
-        console.log("handleContractClick", item);
+        setOrderItem(item);
+        console.log("item", item)
+        instance.post('/messagesByDialog', {
+            fromId: userinfo.id,
+            toId: item.userId   
+        }).then(res => {
+            setBoxMessage(res.data.datas[0]);
+        })
         navigate('/contact', { state: { item } });  // 携带 item 数据
     }
 

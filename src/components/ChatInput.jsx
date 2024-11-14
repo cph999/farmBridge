@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Input, ActionSheet } from 'react-vant';
+import { Button, Input, ActionSheet, ProductCard } from 'react-vant';
 import './ChatInput.css';
 import EmojiPicker from 'emoji-picker-react';
 import { SmileO, AddO, Location, OrdersO, UserO, Photo } from '@react-vant/icons';
 
-function ChatInput({ onSend }) {
+function ChatInput({ onSend, userinfo }) {
     const [message, setMessage] = useState('');
     const [showEmoji, setShowEmoji] = useState(false);
     const [sendState, setSendState] = useState(false);
     const [visible, setVisible] = useState(-1)
-    const [file, setFile] = useState(null); // 用来存储选择的图片文件
     const onCancel = () => setVisible(-1)
 
     useEffect(() => {
@@ -22,7 +21,7 @@ function ChatInput({ onSend }) {
 
     const handleSend = () => {
         if (message.trim()) {
-            onSend(message);
+            onSend(message, "str");
             setMessage('');
             setShowEmoji(false);
         }
@@ -40,23 +39,29 @@ function ChatInput({ onSend }) {
         input.onchange = async (e) => {
             const selectedFile = e.target.files[0];
             if (selectedFile) {
-                await upload(selectedFile); 
+                await upload(selectedFile);
             }
         };
-        input.click(); 
+        input.click();
     };
+
+    const handleCardClick = () => {
+        onSend(JSON.stringify(userinfo), "card");
+    }
 
     const upload = async (file) => {
         try {
             const body = new FormData();
-            body.append('source', file);
-            const resp = await fetch("123", {
+            body.append('file', file);
+            const resp = await fetch("http://localhost:8809/api/uploadFile", {
                 method: 'POST',
                 body,
             });
             const json = await resp.json();
             // 这里可以处理上传后的返回数据，比如返回图片的URL
-            console.log('Upload successful:', json);
+            console.log('Upload successful:', json.data.url);
+            onSend(json.data.url, "image");
+
         } catch (error) {
             console.error('Upload failed:', error);
         }
@@ -112,7 +117,7 @@ function ChatInput({ onSend }) {
                         <div>相册</div>
                     </div>
                     <div>
-                        <UserO fontSize="2.5em" />
+                        <UserO fontSize="2.5em" onClick={handleCardClick} />
                         <div>名片</div>
                     </div>
                     <div>

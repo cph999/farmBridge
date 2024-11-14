@@ -12,17 +12,20 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const websocketRef = useRef(null);  // 使用 useRef 存储 WebSocket 实例
   const [userinfo, setUserinfo] = useState({});
-  const boxMessage = [{
+  const [orderItem, setOrderItem] = useState({});
+  const [boxMessage, setBoxMessage] = useState([{
     "id": 192,
     "fromId": 68,
     "fromNickname": "小牧",
     "fromIcon": "https://app102.acapp.acwing.com.cn/media/1729307339239.png",
     "toId": 65,
     "toNickname": "小虫",
+    "type": "str",
     "toIcon": "https://yup1.oss-cn-hangzhou.aliyuncs.com/images/images/3.png",
     "message": "我对你发布的商品感兴趣，快来和我聊天吧！",
     "createdTime": "Nov 13, 2024 11:02:04 AM"
-  }];
+  }]);
+
   const handleLoginSuccess = () => {
     const u = LocalStorageUtil.getItem("userinfo");
     setIsAuthenticated(true);
@@ -117,14 +120,14 @@ function App() {
             path="/home/*"
             element={
               isAuthenticated ? (
-                <Home handleLogOut={handleLogOut} userinfo={userinfo} websocket={websocketRef.current} />
+                <Home handleLogOut={handleLogOut} userinfo={userinfo} websocket={websocketRef.current} setOrderItem={setOrderItem} setBoxMessage={setBoxMessage} />
               ) : (
                 <Navigate to="/" replace />
               )
             }
           />
           <Route path="/post-detail" element={<PostDetail />} />
-          <Route path="/contact" element={<ChatBox userinfo={userinfo} boxMessage={boxMessage} sendMessage={sendMessage} />} />
+          <Route path="/contact" element={<ChatBox userinfo={userinfo} boxMessage={boxMessage} sendMessage={sendMessage} orderItem={orderItem} />} />
         </Routes>
       </Router>
     </div>

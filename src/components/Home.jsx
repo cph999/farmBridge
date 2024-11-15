@@ -7,7 +7,7 @@ import Profile from "./Profile.jsx";
 import Publish from "./Publish.jsx";
 import LocalStorageUtil from "../utils/LocalStorageUtil";
 
-const Home = ({ websocket, setOrderItem, setBoxMessage }) => {
+const Home = ({ websocket, setOrderItem, setBoxMessage,boxMessage }) => {
 
     const [activeTab, setActiveTab] = useState('home');
     const [userinfo, setUserinfo] = useState(LocalStorageUtil.getItem("userinfo")); // 定义一个 state 变量存储用户名
@@ -19,7 +19,7 @@ const Home = ({ websocket, setOrderItem, setBoxMessage }) => {
             case 'trade':
                 return <Trade userinfo={userinfo} />;
             case 'chat':
-                return <Chat userinfo={userinfo} websocket={websocket} />;
+                return <Chat userinfo={userinfo} websocket={websocket} setBoxMessageApp={setBoxMessage} boxMessageApp={boxMessage}/>;
             case 'profile':
                 return <Profile userinfo={userinfo} setUserinfox={setUserinfo} />;
             default:

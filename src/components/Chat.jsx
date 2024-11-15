@@ -7,7 +7,7 @@ import defaultIcon from '../assets/icon.png';
 import ChatBox from './ChatBox.jsx';
 import { AddO } from '@react-vant/icons';
 
-function Chat({ userinfo, websocket,setBoxMessageApp,boxMessageApp }) {
+function Chat({ userinfo, websocket, setBoxMessageApp, boxMessageApp }) {
     const [messages, setMessages] = useState([]); // 所有消息
     const [finish, setFinish] = useState(false);
     const [boxMessage, setBoxMessage] = useState([]); // 当前对话人的消息
@@ -49,7 +49,11 @@ function Chat({ userinfo, websocket,setBoxMessageApp,boxMessageApp }) {
                 const newMessage = JSON.parse(event.data);
                 let flag = false;
                 console.log("newMessage", newMessage)
-                setBoxMessageApp((prevMessages) => [...prevMessages, newMessage]);
+                setBoxMessageApp((prevMessages) => {
+                    if (prevMessages[0].fromId === newMessage.fromId || prevMessages[0].toId === newMessage.fromId)
+                        return [...prevMessages, newMessage]
+                    else return [...prevMessages];
+                });
                 setMessages((prevMessages) => {
                     const updatedMessages = [...prevMessages];
                     const currentBoxMessage = boxMessageRef.current;

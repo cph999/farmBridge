@@ -121,7 +121,7 @@ function App() {
             element={
               isAuthenticated ? (
                 <Home handleLogOut={handleLogOut} userinfo={userinfo} websocket={websocketRef.current} setOrderItem={setOrderItem}
-                      setBoxMessage={setBoxMessage} boxMessage={boxMessage}/>
+                  setBoxMessage={setBoxMessage} boxMessage={boxMessage} />
               ) : (
                 <Navigate to="/" replace />
               )

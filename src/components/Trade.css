@@ -1,0 +1,51 @@
+.trade-container {
+    padding: 10px;
+}
+
+.commodity-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.commodity-item {
+    width: 48%; /* 每行显示两个商品 */
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.commodity-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.commodity-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.commodity-details h3 {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.commodity-details p {
+    font-size: 14px;
+    color: #666;
+    margin: 5px 0;
+}
+
+.commodity-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #333;
+}

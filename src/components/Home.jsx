@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabbar } from 'react-vant';
 import { HomeO, Search, FriendsO, SettingO } from '@react-vant/icons';
 import Trade from "./Trade.jsx";
@@ -6,11 +6,19 @@ import Chat from "./Chat.jsx";
 import Profile from "./Profile.jsx";
 import Publish from "./Publish.jsx";
 import LocalStorageUtil from "../utils/LocalStorageUtil";
+import { useLocation } from "react-router";
 
-const Home = ({ websocket, setOrderItem, setBoxMessage,boxMessage }) => {
-
-    const [activeTab, setActiveTab] = useState('home');
+const Home = ({ websocket, setOrderItem, setBoxMessage, boxMessage }) => {
+    const location = useLocation();
+    const { item } = location.state || {}; // 获取传递的数据
+    const [activeTab, setActiveTab] = useState('publish'); // 默认首页
     const [userinfo, setUserinfo] = useState(LocalStorageUtil.getItem("userinfo")); // 定义一个 state 变量存储用户名
+
+    useEffect(() => {
+        if (item) {
+            setActiveTab(item); // 如果有 item 数据，设置对应的 tab
+        }
+    }, [item]);
 
     const renderContent = () => {
         switch (activeTab) {
@@ -19,12 +27,11 @@ const Home = ({ websocket, setOrderItem, setBoxMessage,boxMessage }) => {
             case 'trade':
                 return <Trade userinfo={userinfo} />;
             case 'chat':
-                return <Chat userinfo={userinfo} websocket={websocket} setBoxMessageApp={setBoxMessage} boxMessageApp={boxMessage}/>;
+                return <Chat userinfo={userinfo} websocket={websocket} setBoxMessageApp={setBoxMessage} boxMessageApp={boxMessage} />;
             case 'profile':
                 return <Profile userinfo={userinfo} setUserinfox={setUserinfo} />;
             default:
                 return <Publish setOrderItem={setOrderItem} userinfo={userinfo} setBoxMessage={setBoxMessage} />;
-
         }
     };
 

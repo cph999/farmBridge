@@ -1,14 +1,15 @@
 import './App.css';
-import React, {useState, useRef} from 'react';
-import {HashRouter as Router, Route, Routes, Navigate} from 'react-router-dom';
+import React, { useState, useRef } from 'react';
+import { HashRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Login from './components/Login.jsx';
 import Home from './components/Home.jsx';
 import LocalStorageUtil from './utils/LocalStorageUtil.js';
 import PostDetail from './components/PostDetail.jsx';
 import ChatBox from './components/ChatBox.jsx';
-import {Toast} from 'react-vant';
+import { Toast } from 'react-vant';
 import Chat from "./components/Chat.jsx";
 import Order from "./components/Order.jsx";
+import Profile from './components/Profile.jsx';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -105,9 +106,9 @@ function App() {
                         path="/"
                         element={
                             isAuthenticated ? (
-                                <Navigate to="/home" replace/>
+                                <Navigate to="/home" replace />
                             ) : (
-                                <Login onLoginSuccess={handleLoginSuccess} setUserinfo={setUserinfo}/>
+                                <Login onLoginSuccess={handleLoginSuccess} setUserinfo={setUserinfo} />
                             )
                         }
                     />
@@ -116,18 +117,22 @@ function App() {
                         element={
                             isAuthenticated ? (
                                 <Home handleLogOut={handleLogOut} userinfo={userinfo} websocket={websocketRef.current}
-                                      setOrderItem={setOrderItem}
-                                      setBoxMessage={setBoxMessage} boxMessage={boxMessage}/>
+                                    setOrderItem={setOrderItem}
+                                    setBoxMessage={setBoxMessage} boxMessage={boxMessage} />
                             ) : (
-                                <Navigate to="/" replace/>
+                                <Navigate to="/" replace />
                             )
                         }
                     />
-                    <Route path="/post-detail" element={<PostDetail/>}/>
-                    <Route path="/order" element={<Order/>}/>
+                    <Route path="/post-detail" element={<PostDetail />} />
+                    <Route path="/myself" element={<Home handleLogOut={handleLogOut} userinfo={userinfo} websocket={websocketRef.current}
+                        setOrderItem={setOrderItem}
+                        setBoxMessage={setBoxMessage} boxMessage={boxMessage} />} />
+
+                    <Route path="/order" element={<Order />} />
                     <Route path="/contact"
-                           element={<ChatBox userinfo={userinfo} boxMessage={boxMessage} sendMessage={sendMessage}
-                                             orderItem={orderItem}/>}/>
+                        element={<ChatBox userinfo={userinfo} boxMessage={boxMessage} sendMessage={sendMessage}
+                            orderItem={orderItem} />} />
                 </Routes>
             </Router>
         </div>

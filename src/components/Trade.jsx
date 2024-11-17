@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import "./Trade.css";
 import instance from "../utils/api";
-import {List, Cell, PullRefresh} from 'react-vant';
-import {useNavigate} from 'react-router-dom';  // 导入 useNavigate
+import { List, Cell, PullRefresh } from 'react-vant';
+import { useNavigate } from 'react-router-dom';  // 导入 useNavigate
 
 const Trade = () => {
     const [commodities, setCommodities] = useState([]);
@@ -10,6 +10,7 @@ const Trade = () => {
     const [pageNum, setPageNum] = useState(1);  // 当前页码
     const [pageSize] = useState(10);  // 每页商品数量
     const [search, setSearch] = useState("");  // 搜索条件
+    const [loading, setLoading] = useState(false); // 当前是否正在请求
 
     const navigator = useNavigate();
 
@@ -25,18 +26,21 @@ const Trade = () => {
 
     const handleClickTrade = (commodity) => {
         console.log("commodity", commodity);
-        navigator("/order", {state: {commodity}})
-    }
+        navigator("/order", { state: { commodity } });
+    };
 
     const fetchCommodities = async () => {
+        if (loading) return; // 如果正在加载，则直接返回
+        setLoading(true); // 设置加载状态
+
         try {
             const res = await instance.post("/getCommodityList", {
                 pageNum,
                 pageSize,
                 search,
             });
-            const newCommodities = res.data.datas || [];
 
+            const newCommodities = res.data.datas || [];
             if (newCommodities.length === 0) {
                 setFinished(true);
             }
@@ -44,14 +48,20 @@ const Trade = () => {
             setCommodities(prev => [...prev, ...newCommodities]);
         } catch (error) {
             console.error("Failed to fetch commodities", error);
+        } finally {
+            setLoading(false); // 请求完成后重置加载状态
         }
     };
 
     const onLoad = async () => {
-        setPageNum(prev => prev + 1);  // 页码自增
+        if (!finished && !loading) {
+            setPageNum(prev => prev + 1);  // 页码自增
+        }
     };
 
     const onRefresh = async () => {
+        if (loading) return; // 避免在刷新时重复触发请求
+
         setPageNum(1);
         setCommodities([]);
         setFinished(false);
@@ -60,13 +70,16 @@ const Trade = () => {
 
     return (
         <div className="trade-container">
-            <PullRefresh onRefresh={onRefresh} style={{marginTop: '10px'}}>
-                <List finished={finished} onLoad={onLoad}>
+            <PullRefresh onRefresh={onRefresh} style={{ marginTop: '10px' }}>
+                <List finished={finished} onLoad={onLoad} loading={loading}>
                     <div className="commodity-list">
                         {commodities.map((commodity, i) => (
-                            <Cell key={i} className="commodity-item" clickable onClick={() => {
-                                handleClickTrade(commodity)
-                            }}>
+                            <Cell
+                                key={i}
+                                className="commodity-item"
+                                clickable
+                                onClick={() => handleClickTrade(commodity)}
+                            >
                                 <div className="commodity-content">
                                     <img
                                         src={commodity.images}

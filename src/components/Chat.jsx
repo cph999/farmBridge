@@ -48,12 +48,13 @@ function Chat({ userinfo, websocket, setBoxMessageApp, boxMessageApp }) {
             ws.onmessage = (event) => {
                 const newMessage = JSON.parse(event.data);
                 let flag = false;
-                console.log("newMessage", newMessage)
                 setBoxMessageApp((prevMessages) => {
-                    if (prevMessages[0].fromId === newMessage.fromId || prevMessages[0].toId === newMessage.fromId)
-                        return [...prevMessages, newMessage]
-                    else return [...prevMessages];
+                    const safePrevMessages = Array.isArray(prevMessages) ? prevMessages : [];
+                    if (userinfo.id === newMessage.fromId || userinfo.id === newMessage.toId) {
+                        return [...safePrevMessages, newMessage]
+                    }
                 });
+
                 setMessages((prevMessages) => {
                     const updatedMessages = [...prevMessages];
                     const currentBoxMessage = boxMessageRef.current;

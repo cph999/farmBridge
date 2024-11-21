@@ -16,8 +16,6 @@ function App() {
     const [userinfo, setUserinfo] = useState({});
     const [orderItem, setOrderItem] = useState({});
     const [initialState, setInitialState] = useState(false);
-    const initialStateRef = useRef(initialState); // 使用 ref 存储当前值
-
 
     const [boxMessage, setBoxMessage] = useState([{
         "id": 192,
@@ -36,10 +34,10 @@ function App() {
         const u = LocalStorageUtil.getItem("userinfo");
         setIsAuthenticated(true);
 
-        // 直接同步更新 ref 和 state
         if (u != null && u !== undefined && JSON.stringify(u) !== '{}') {
-            // 创建 WebSocket 实例
             const wsInstance = new WebSocket(`ws://localhost:8809/chat?userId=${u.id}`);
+            // const wsInstance = new WebSocket(`wss://app102.acapp.acwing.com.cn/chat?userId=${userinfo.id}`);
+
 
             wsInstance.onopen = () => {
                 console.log('WebSocket connected');
@@ -53,18 +51,12 @@ function App() {
                 console.log('WebSocket disconnected');
             };
 
-            // 将 WebSocket 实例存储在 websocketRef 中
             websocketRef.current = wsInstance;
-
-            // WebSocket 已连接后更新状态和 ref
-            setInitialState(true); // 显示 Chat 组件
-
-            // 延时设置 initialState 为 false
+            setInitialState(true);
             setTimeout(() => {
-                setInitialState(false); // 隐藏 Chat 组件
+                setInitialState(false);
             }, 500);
 
-            // 确保在组件卸载时关闭 WebSocket
             return () => {
                 if (wsInstance) {
                     wsInstance.close();
@@ -132,7 +124,7 @@ function App() {
                     <Route path="/order" element={<Order />} />
                     <Route path="/contact"
                         element={<ChatBox userinfo={userinfo} boxMessage={boxMessage} sendMessage={sendMessage}
-                            orderItem={orderItem}  />} />
+                            orderItem={orderItem} />} />
                 </Routes>
             </Router>
         </div>

@@ -51,7 +51,7 @@ const Publish = ({ boxMessage, setBoxMessage, sendMessage, setOrderItem, userinf
                 }}
             >
                 <Image
-                    src={item.images}
+                    src={item.images.includes(',') ? item.images.split(',')[0].trim() : item.images.trim()}
                     alt="封面图片"
                     style={{
                         width: '100%',

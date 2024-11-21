@@ -60,7 +60,6 @@ function Chat({ userinfo, websocket, setBoxMessageApp, boxMessageApp }) {
                     }
                 });
                 if (newMessage.type === "bid-reply") {
-                    console.log("setChatRestrictState", JSON.parse(newMessage.message).chatRestrictState)
                     setChatRestrictState(JSON.parse(newMessage.message).chatRestrictState);
                 }
 

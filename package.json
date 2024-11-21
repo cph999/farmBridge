@@ -2,6 +2,7 @@
   "name": "farm-bridge",
   "version": "0.1.0",
   "private": true,
+  "homepage": "./",
   "dependencies": {
     "@amap/amap-jsapi-loader": "^1.0.1",
     "@react-vant/icons": "^0.1.0",
@@ -17,6 +18,8 @@
     "react-router": "^6.28.0",
     "react-router-dom": "^6.28.0",
     "react-scripts": "5.0.1",
+    "react-swipeable": "^7.0.2",
+    "react-transition-group": "^4.4.5",
     "react-vant": "^3.3.5",
     "web-vitals": "^2.1.4"
   },

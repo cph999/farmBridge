@@ -94,7 +94,7 @@ function ChatInput({ onSend, userinfo, chatRestrictState, setChatRestrictState, 
         try {
             const body = new FormData();
             body.append('file', file);
-            const resp = await fetch('http://localhost:8809/api/uploadFile', {
+            const resp = await fetch('https://app102.acapp.acwing.com.cn/api/uploadFile', {
                 method: 'POST',
                 body,
             });

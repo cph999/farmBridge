@@ -3,6 +3,7 @@ import './AddPost.css';
 import { Toast, Uploader, Input, Selector, Button, Form } from 'react-vant';
 import { AddO, Location, GuideO } from "@react-vant/icons";
 import instance from "../utils/api";
+import MapContainer from "./MapContainer";
 
 const AddPost = () => {
     const [title, setTitle] = useState('');
@@ -31,7 +32,7 @@ const AddPost = () => {
             const body = new FormData();
             body.append('file', file);
 
-            const resp = await fetch('http://localhost:8809/api/uploadFile', {
+            const resp = await fetch('https://app102.acapp.acwing.com.cn/api/uploadFile', {
                 method: 'POST',
                 body,
             });
@@ -103,8 +104,10 @@ const AddPost = () => {
                         options={options}
                         defaultValue={['1']}
                         onChange={(arr, extend) => {
-                            setCategoryCode(extend.items[0].value)
-                            setCategoryName(extend.items[0].label)
+                            if (extend.items.length !== 0) {
+                                setCategoryCode(extend.items[0].value)
+                                setCategoryName(extend.items[0].label)
+                            }
                         }
                         }
                     />
@@ -119,8 +122,8 @@ const AddPost = () => {
                 <Input
                     placeholder="标记地点"
                     prefix={<Location />}
-                    value={title}
-                    onChange={setTitle}
+                    // value={title}
+                    // onChange={setTitle}
                     className="add-post-title-input"
                 />
                 <Button type='primary' plain round size='large' onClick={() => { handleSubmitPost() }}>发布</Button>

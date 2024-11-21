@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Tabbar } from 'react-vant';
-import { HomeO, Search, FriendsO, SettingO, AddO } from '@react-vant/icons';
+import { Tabbar } from "react-vant";
+import { HomeO, Search, FriendsO, SettingO, AddO } from "@react-vant/icons";
+import { useSwipeable } from "react-swipeable";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
 import Trade from "./Trade.jsx";
 import Chat from "./Chat.jsx";
 import Profile from "./Profile.jsx";
@@ -9,39 +11,94 @@ import LocalStorageUtil from "../utils/LocalStorageUtil";
 import { useLocation } from "react-router";
 import AddPost from "./AddPost.jsx";
 
-const Home = ({ websocket, setOrderItem, setBoxMessage, boxMessage, chatRestrictState, setChatRestrictState }) => {
+const Home = ({
+    websocket,
+    setOrderItem,
+    setBoxMessage,
+    boxMessage,
+    chatRestrictState,
+    setChatRestrictState,
+}) => {
     const location = useLocation();
-    const { item } = location.state || {}; // 获取传递的数据
-    const [activeTab, setActiveTab] = useState('publish'); // 默认首页
-    const [userinfo, setUserinfo] = useState(LocalStorageUtil.getItem("userinfo")); // 定义一个 state 变量存储用户名
+    const { item } = location.state || {};
+    const [activeTab, setActiveTab] = useState("publish"); // 默认首页
+    const [slideDirection, setSlideDirection] = useState("right"); // 滑动方向
+    const [userinfo, setUserinfo] = useState(
+        LocalStorageUtil.getItem("userinfo")
+    );
+
+    const tabs = ["publish", "trade", "add", "chat", "profile"]; // Tab 顺序
 
     useEffect(() => {
         if (item) {
-            setActiveTab(item); // 如果有 item 数据，设置对应的 tab
+            setActiveTab(item);
         }
     }, [item]);
 
+    // 手势处理
+    const handlers = useSwipeable({
+        onSwipedLeft: () => {
+            const nextIndex = (tabs.indexOf(activeTab) + 1) % tabs.length;
+            setSlideDirection("left"); // 设置滑动方向为左
+            setActiveTab(tabs[nextIndex]);
+        },
+        onSwipedRight: () => {
+            const prevIndex = (tabs.indexOf(activeTab) - 1 + tabs.length) % tabs.length;
+            setSlideDirection("right"); // 设置滑动方向为右
+            setActiveTab(tabs[prevIndex]);
+        },
+        trackMouse: true,
+    });
+
     const renderContent = () => {
         switch (activeTab) {
-            case 'publish':
-                return <Publish setOrderItem={setOrderItem} userinfo={userinfo} setBoxMessage={setBoxMessage} />;
-            case 'trade':
+            case "publish":
+                return (
+                    <Publish
+                        setOrderItem={setOrderItem}
+                        userinfo={userinfo}
+                        setBoxMessage={setBoxMessage}
+                    />
+                );
+            case "trade":
                 return <Trade userinfo={userinfo} />;
-            case 'chat':
-                return <Chat userinfo={userinfo} websocket={websocket} setBoxMessageApp={setBoxMessage} boxMessageApp={boxMessage} />;
-            case 'profile':
+            case "chat":
+                return (
+                    <Chat
+                        userinfo={userinfo}
+                        websocket={websocket}
+                        setBoxMessageApp={setBoxMessage}
+                        boxMessageApp={boxMessage}
+                    />
+                );
+            case "profile":
                 return <Profile userinfo={userinfo} setUserinfox={setUserinfo} />;
-            case 'add':
-                return <AddPost> </AddPost>;
+            case "add":
+                return <AddPost />;
             default:
-                return <Publish setOrderItem={setOrderItem} userinfo={userinfo} setBoxMessage={setBoxMessage} />;
+                return (
+                    <Publish
+                        setOrderItem={setOrderItem}
+                        userinfo={userinfo}
+                        setBoxMessage={setBoxMessage}
+                    />
+                );
         }
     };
 
     return (
-        <div>
-            {renderContent()}
-            <Tabbar active={activeTab} onChange={setActiveTab}>
+        <div {...handlers} style={{ touchAction: "pan-y" }}>
+            {/* 动态切换动画类名 */}
+            <TransitionGroup>
+                <CSSTransition
+                    key={activeTab}
+                    classNames={`slide-${slideDirection}`} // 根据滑动方向动态切换类名
+                    timeout={300}
+                >
+                    <div>{renderContent()}</div>
+                </CSSTransition>
+            </TransitionGroup>
+            <Tabbar active={activeTab} onChange={(name) => setActiveTab(name)}>
                 <Tabbar.Item icon={<HomeO />} name="publish">
                     首页
                 </Tabbar.Item>

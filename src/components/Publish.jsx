@@ -126,7 +126,7 @@ const Publish = ({ boxMessage, setBoxMessage, sendMessage, setOrderItem, userinf
         console.log("item", item)
         instance.post('/messagesByDialog', {
             fromId: userinfo.id,
-            toId: item.userId   
+            toId: item.userId
         }).then(res => {
             setBoxMessage(res.data.datas[0]);
         })
@@ -164,8 +164,10 @@ const Publish = ({ boxMessage, setBoxMessage, sendMessage, setOrderItem, userinf
                                 <Flex.Item key={i} span={12} className='item-box'>
                                     <Card round>
                                         <Card.Cover onClick={() => handleCardClick(item)}>
-                                            <Image src={item.images}
-                                                style={{ width: '100%', height: '15vh', objectFit: 'cover' }} />
+                                            <Image
+                                                src={item.images.includes(',') ? item.images.split(',')[0].trim() : item.images.trim()}
+                                                style={{ width: '100%', height: '15vh', objectFit: 'cover' }}
+                                            />
                                         </Card.Cover>
                                         <Card.Header
                                             extra={<Arrow />}

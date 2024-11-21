@@ -17,6 +17,11 @@ function Chat({ userinfo, websocket, setBoxMessageApp, boxMessageApp }) {
     const [userList, setUserList] = useState([]);
     const [search, setSearch] = useState('');
     const [addFriendText, setAddFriendText] = useState('添加好友');
+    // 1: 只能购买人报价，也就是不是发布人
+    // 发布人只能接受或者拒绝报价
+    // 2: 对方接受/不接受 3. 接受：在线/离线交易 4: 开放聊天功能
+    const [chatRestrictState, setChatRestrictState] = useState(1);
+
 
     // 同步boxMessage到boxMessageRef
     useEffect(() => {
@@ -54,6 +59,10 @@ function Chat({ userinfo, websocket, setBoxMessageApp, boxMessageApp }) {
                         return [...safePrevMessages, newMessage]
                     }
                 });
+                if (newMessage.type === "bid-reply") {
+                    console.log("setChatRestrictState", JSON.parse(newMessage.message).chatRestrictState)
+                    setChatRestrictState(JSON.parse(newMessage.message).chatRestrictState);
+                }
 
                 setMessages((prevMessages) => {
                     const updatedMessages = [...prevMessages];
@@ -223,6 +232,8 @@ function Chat({ userinfo, websocket, setBoxMessageApp, boxMessageApp }) {
                     setChatState={setChatState}
                     userinfo={userinfo}
                     sendMessage={sendMessage}
+                    chatRestrictState={chatRestrictState}
+                    setChatRestrictState={setChatRestrictState}
                 />
             )}
 

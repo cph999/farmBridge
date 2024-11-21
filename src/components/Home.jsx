@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Tabbar } from 'react-vant';
-import { HomeO, Search, FriendsO, SettingO } from '@react-vant/icons';
+import { HomeO, Search, FriendsO, SettingO, AddO } from '@react-vant/icons';
 import Trade from "./Trade.jsx";
 import Chat from "./Chat.jsx";
 import Profile from "./Profile.jsx";
 import Publish from "./Publish.jsx";
 import LocalStorageUtil from "../utils/LocalStorageUtil";
 import { useLocation } from "react-router";
+import AddPost from "./AddPost.jsx";
 
-const Home = ({ websocket, setOrderItem, setBoxMessage, boxMessage }) => {
+const Home = ({ websocket, setOrderItem, setBoxMessage, boxMessage, chatRestrictState, setChatRestrictState }) => {
     const location = useLocation();
     const { item } = location.state || {}; // 获取传递的数据
     const [activeTab, setActiveTab] = useState('publish'); // 默认首页
@@ -30,6 +31,8 @@ const Home = ({ websocket, setOrderItem, setBoxMessage, boxMessage }) => {
                 return <Chat userinfo={userinfo} websocket={websocket} setBoxMessageApp={setBoxMessage} boxMessageApp={boxMessage} />;
             case 'profile':
                 return <Profile userinfo={userinfo} setUserinfox={setUserinfo} />;
+            case 'add':
+                return <AddPost> </AddPost>;
             default:
                 return <Publish setOrderItem={setOrderItem} userinfo={userinfo} setBoxMessage={setBoxMessage} />;
         }
@@ -44,6 +47,9 @@ const Home = ({ websocket, setOrderItem, setBoxMessage, boxMessage }) => {
                 </Tabbar.Item>
                 <Tabbar.Item icon={<Search />} name="trade" badge={{ dot: true }}>
                     商城
+                </Tabbar.Item>
+                <Tabbar.Item icon={<AddO />} name="add" badge={{ dot: true }}>
+                    发布
                 </Tabbar.Item>
                 <Tabbar.Item icon={<FriendsO />} name="chat" badge={{ content: 5 }}>
                     聊天

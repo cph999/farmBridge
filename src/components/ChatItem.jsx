@@ -1,15 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Image, Typography, ProductCard, Tag, Button, Card } from 'react-vant';
 import './ChatItem.css';
-import instance from '../utils/api';
 
-
-function ChatItem({ message, userinfo }) {
+function ChatItem({ message, userinfo, accptBid, refuseBid, chatRestrictState, setChatRestrictState, handleClickTrade }) {
     const isSentByUser = userinfo.id === message.fromId;
-
-    const handleAcceptBid = () => {
-        instance.post("/a",)
-    }
 
     return (
         <div className={`message-item ${isSentByUser ? 'sent' : 'received'}`}>
@@ -106,24 +100,155 @@ function ChatItem({ message, userinfo }) {
                                             {JSON.parse(message.message).bidPrice}
                                         </span>
                                     </span>
-                                    <Button
-                                        type="danger"
-                                        size="small"
-                                        round
-                                        onClick={() => { }}
-                                    >
-                                        接受报价
-                                    </Button>
                                 </div>
                                 <Typography.Text style={{ fontSize: '14px', color: '#888' }}>
                                     <strong>昵称：</strong>
                                     {JSON.parse(message.message).nickname}
                                 </Typography.Text>
+
+                                <div>
+                                    <Button
+                                        type="danger"
+                                        size="small"
+                                        round
+                                        onClick={() => { accptBid(message) }}
+                                    >
+                                        接受报价
+                                    </Button>
+
+                                    <Button
+                                        type="danger"
+                                        size="small"
+                                        round
+                                        onClick={() => { refuseBid(message) }}
+                                    >
+                                        拒绝报价
+                                    </Button>
+                                </div>
+
+                            </Card.Body>
+                        </Card>
+                    </div>
+                )}
+                {message.type === "complete-bid" && (
+                    <div >
+                        <Card round>
+                            <Card.Header
+                                style={{
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                    color: '#333',
+                                    borderBottom: '1px solid #f0f0f0',
+                                    paddingBottom: '8px',
+                                    marginBottom: '8px',
+                                }}
+                            >
+                                交易完成
+                            </Card.Header>
+                            <Card.Body
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '10px',
+                                    backgroundColor: '#f9f9f9',
+                                    borderRadius: '10px',
+                                    padding: '15px',
+                                }}
+                            >
+                                <Typography.Text size="lg" style={{ fontWeight: 'bold', color: '#4caf50' }}>
+                                    我已经交易且付款成功
+                                </Typography.Text>
+                                <div>
+                                    <strong>付款价格：</strong>
+                                    <span
+                                        style={{
+                                            color: '#ff4d4f',
+                                            fontWeight: 'bold',
+                                            fontSize: '16px',
+                                        }}
+                                    >
+                                        {JSON.parse(message.message).bidPrice || JSON.parse(JSON.parse(message.message).message).bidPrice || "未提供价格"}
+                                    </span>
+                                </div>
+                                <Typography.Text style={{ fontSize: '14px', color: '#888' }}>
+                                    <strong>商品描述：</strong>
+                                    {JSON.parse(message.message).description || JSON.parse(JSON.parse(message.message).message).description}
+                                </Typography.Text>
+                                <Typography.Text style={{ fontSize: '14px', color: '#888' }}>
+                                    <strong>位置：</strong>
+                                    {JSON.parse(message.message).locationInfo || JSON.parse(JSON.parse(message.message).message).locationInfo}
+                                </Typography.Text>
+                            </Card.Body>
+                        </Card>
+                    </div>
+                )}
+
+                {message.type === "bid-reply" && (
+                    <div style={{ width: "100%", padding: '10px 0' }}>
+                        <Card round>
+                            <Card.Header
+                                style={{
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                    color: '#333',
+                                    borderBottom: '1px solid #f0f0f0',
+                                    paddingBottom: '8px',
+                                    marginBottom: '8px',
+                                }}
+                            >
+                                报价回复
+                            </Card.Header>
+                            <Card.Body
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '10px',
+                                    backgroundColor: '#f9f9f9',
+                                    borderRadius: '10px',
+                                    padding: '15px',
+                                }}
+                            >
+                                {(JSON.parse(message.message).chatRestrictState === 3 &&
+                                    <div>
+                                        <Typography.Text size="lg" style={{ fontWeight: 'bold', color: '#4caf50' }}>
+                                            我已接受你的报价：{JSON.parse(message.message).bidPrice || JSON.parse(JSON.parse(message.message).message).bidPrice}
+                                        </Typography.Text>
+                                        <div>您可以发起交易并选择交易方式</div>
+                                        <Button
+                                            type="primary"
+                                            size="small"
+                                            round
+                                            onClick={() => {
+                                                handleClickTrade(message)
+                                            }}
+                                        >
+                                            发起交易
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {JSON.parse(message.message).chatRestrictState === 4 && (
+                                    <div>
+                                        <Typography.Text size="lg" style={{ fontWeight: 'bold', color: '#f44336' }}>
+                                            我拒绝你的报价：{JSON.parse(message.message).bidPrice || JSON.parse(JSON.parse(message.message).message).bidPrice}
+                                        </Typography.Text>
+                                        <div>您可以重新报价</div>
+                                        <Button
+                                            type="primary"
+                                            size="small"
+                                            round
+                                            onClick={() => { setChatRestrictState(1) }}
+                                        >
+                                            重新报价
+                                        </Button>
+                                    </div>
+                                )}
                             </Card.Body>
                         </Card>
                     </div>
                 )}
             </Typography.Text>
+
             {isSentByUser && (
                 <Image
                     src={userinfo.cover}

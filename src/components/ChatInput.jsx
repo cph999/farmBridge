@@ -23,7 +23,7 @@ function ChatInput({ onSend, userinfo, chatRestrictState, setChatRestrictState, 
 
     // Handle the send action
     const handleSend = () => {
-        if (chatRestrictState !== 4) {
+        if (chatRestrictState !== 5) {
             Toast.fail('当前状态无法发送消息,只能发起报价');
             return;
         }
@@ -72,10 +72,11 @@ function ChatInput({ onSend, userinfo, chatRestrictState, setChatRestrictState, 
     const completeBid = () => {
         //等待对方回复
         if (quoteAmount === undefined || quoteAmount === null || quoteAmount === 0 || quoteAmount === "") {
+            Toast.fail('请输入报价金额');
             return;
         }
         setChatRestrictState(2);
-        const bidItem = Object.assign({}, userinfo, orderItem, { bidPrice: quoteAmount, chatRestrictState });
+        const bidItem = Object.assign({}, userinfo, orderItem, { bidPrice: quoteAmount, chatRestrictState: 2 });
         bidItem.orderId = orderItem.id;
         onSend(JSON.stringify(bidItem), 'bid');
     }
@@ -146,9 +147,9 @@ function ChatInput({ onSend, userinfo, chatRestrictState, setChatRestrictState, 
                     发送
                 </Button>
             )}
-
-            {chatRestrictState === 1 && (
+            {chatRestrictState === 1 && orderItem && userinfo.id !== orderItem.userId && (
                 <div>
+                    123123
                     <NumberKeyboard
                         title="报价"
                         extraKey="."

@@ -1,35 +1,83 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { NavBar, List, SubmitBar, Card, Image } from 'react-vant';
+import { useNavigate } from "react-router-dom";
+import { NavBar, SubmitBar, Card, Image, Toast, Dialog, Button, Flex } from 'react-vant';
 import ChatItem from './ChatItem.jsx';
 import ChatInput from './ChatInput.jsx';
 import './ChatBox.css';
+import instance from "../utils/api.js";
+import { WechatPay, Alipay } from '@react-vant/icons';
 
 function ChatBox({ boxMessage, setChatState, userinfo, sendMessage, orderItem }) {
-    const location = useLocation();
     const navigate = useNavigate();
     const [quoteAmount, setQuoteAmount] = useState('');
-
-    // 从 location.state 获取传递的 item 数据
-    const { item } = location.state || {};
-    //1: 只能购买人报价，也就是不是发布人
-    // 发布人只能接受或者拒绝报价
-    // 2:对方接受/不接受 3.接受：在线/离线交易 4: 开放聊天功能 
+    const [visibleTrade, setVisibleTrade] = useState(false);
+    const [visiblePayment, setVisiblePayment] = useState(false); // 控制支付方式选择对话框
+    const [selectedPayment, setSelectedPayment] = useState(''); // 存储选中的支付方式
+    const [tradeStateMessage, setTradeStateMessage] = useState({});
     const [chatRestrictState, setChatRestrictState] = useState(1);
+    // 接受报价
+    const accptBid = (message) => {
+        console.log('accptBid message:', message);
+        if (userinfo.id === message.fromId) {
+            Toast.fail('无法处理自己的报价');
+            return;
+        }
+        // 生成报价对象
+        const parsedMessage = JSON.parse(message.message);
+        parsedMessage.chatRestrictState = 3;
 
-    // 本地的消息列表状态
+        const bidItem = Object.assign({}, userinfo, message, {
+            bidPrice: quoteAmount,
+            chatRestrictState: 3,
+            message: JSON.stringify(parsedMessage)
+        });
+
+        bidItem.orderId = JSON.parse(message.message).orderId;
+        handleSend(JSON.stringify(bidItem), 'bid-reply');
+        setChatRestrictState(3);
+    };
+
+
+
+    // 拒绝报价
+    const refuseBid = (message) => {
+        if (userinfo.id === message.fromId) {
+            Toast.fail('无法处理自己的报价');
+            return;
+        }
+        // 生成报价对象
+        const parsedMessage = JSON.parse(message.message);
+        parsedMessage.chatRestrictState = 4;
+
+        const bidItem = Object.assign({}, userinfo, message, {
+            bidPrice: quoteAmount,
+            chatRestrictState: 4,
+            message: JSON.stringify(parsedMessage)
+        });
+
+        bidItem.orderId = JSON.parse(message.message).orderId;
+        handleSend(JSON.stringify(bidItem), 'bid-reply');
+        setChatRestrictState(4);
+    };
+
+    const handleClickTrade = (m) => {
+        if (m.toId === userinfo.id) {
+            setTradeStateMessage(m);
+            setVisibleTrade(true);
+        } else {
+            Toast.fail('无法处理自己的报价');
+        }
+    }
+
     const [messages, setMessages] = useState(boxMessage);
 
     // 获取消息列表容器的引用
     const messageEndRef = useRef(null);
 
-    // 每当 boxMessage 更新时，更新本地的消息列表
     useEffect(() => {
-        console.log("boxMessage", boxMessage)
         setMessages(boxMessage);
     }, [boxMessage]);
 
-    // 每当 messages 更新时，滚动到容器底部
     useEffect(() => {
         if (messageEndRef.current) {
             messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -37,18 +85,54 @@ function ChatBox({ boxMessage, setChatState, userinfo, sendMessage, orderItem })
     }, [messages]);
 
     useEffect(() => {
+        if (visiblePayment) {
+            let timeRemaining = 30 * 60; // 30分钟倒计时（秒）
+            const timer = setInterval(() => {
+                if (timeRemaining <= 0) {
+                    clearInterval(timer);
+                    Toast.fail('支付超时，请重新发起支付');
+                    setVisiblePayment(false); // 超时关闭支付框
+                    return;
+                }
+                timeRemaining -= 1;
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                document.getElementById("countdown-timer").textContent = `${minutes
+                    .toString()
+                    .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+            return () => clearInterval(timer);
+        }
+    }, [visiblePayment]);
+
+    useEffect(() => {
         if (orderItem && orderItem !== '{}') {
             if (userinfo.id !== orderItem.userId) {
-                //只能报价
                 setChatRestrictState(1);
             }
         }
+        if (boxMessage === null || boxMessage === undefined || boxMessage.length === 0) return;
+        const bidMessage = boxMessage.reverse().find(message => message.type === 'bid' && orderItem && JSON.parse(message.message).orderId === orderItem.id);
+        if (bidMessage) {
+            const bidItem = Object.assign({}, userinfo, bidMessage, { bidPrice: quoteAmount, chatRestrictState: 3 });
+            bidItem.orderId = bidMessage.orderId; // 使用报价消息中的 orderId，获取后台的chatState
+            const fetchIsBid = async () => {
+                instance.post("/isBid", bidItem)
+                    .then(res => {
+                        if (res.data.code === 200) {
+                            setChatRestrictState(res.data.data.chatRestrictState);
+                        }
+                    })
+            }
+            fetchIsBid();
+        }
+        setChatRestrictState(1);
     }, [orderItem]);
 
     // 处理发送消息
     const handleSend = (newMessage, type) => {
-        var otherUser = {};
-        if (orderItem && orderItem !== '{}') {
+        let otherUser = {};
+        if (orderItem && orderItem !== '{}' && orderItem.userId !== userinfo.id) {
             otherUser = orderItem.userId;
         } else {
             otherUser = userinfo.id === boxMessage[0].fromId ? boxMessage[0].toId : boxMessage[0].fromId;
@@ -61,15 +145,21 @@ function ChatBox({ boxMessage, setChatState, userinfo, sendMessage, orderItem })
             createdTime: new Date(),
             type: type,
             fromNickname: userinfo.nickname,
-            toNickname: undefined !== boxMessage && boxMessage.length > 0 ? userinfo.id === boxMessage[0].fromId ? boxMessage[0].toNickname : boxMessage[0].fromNickname : "",
-            toIcon: undefined !== boxMessage && boxMessage.length > 0 ? userinfo.id === boxMessage[0].fromId ? boxMessage[0].toIcon : boxMessage[0].fromIcon : "",
+            toNickname: undefined !== boxMessage && boxMessage.length > 0
+                ? userinfo.id === boxMessage[0].fromId
+                    ? boxMessage[0].toNickname
+                    : boxMessage[0].fromNickname
+                : "",
+            toIcon: undefined !== boxMessage && boxMessage.length > 0
+                ? userinfo.id === boxMessage[0].fromId
+                    ? boxMessage[0].toIcon
+                    : boxMessage[0].fromIcon
+                : "",
         };
-
         setMessages((prevMessages) => {
             const safePrevMessages = Array.isArray(prevMessages) ? prevMessages : [];
             return [...safePrevMessages, newMessageObject];
         });
-
 
         sendMessage(newMessageObject);
     };
@@ -83,6 +173,14 @@ function ChatBox({ boxMessage, setChatState, userinfo, sendMessage, orderItem })
         }
     };
 
+    // 选择支付方式
+    const handlePaymentChoice = (paymentMethod) => {
+        setSelectedPayment(paymentMethod);
+        Toast.success(`${paymentMethod}支付选择成功`);
+        setVisiblePayment(false);
+        handleSend(JSON.stringify(tradeStateMessage), "complete-bid")
+        setChatRestrictState(5)
+    };
 
     return (
         <div className="chat-box">
@@ -90,37 +188,182 @@ function ChatBox({ boxMessage, setChatState, userinfo, sendMessage, orderItem })
                 leftText="返回"
                 onClickLeft={handleBack}
             />
-            {
-                chatRestrictState === 1 &&
-                <Card round>
-                    <Card.Header>我的报价</Card.Header>
+            {visibleTrade && (
+                <Dialog
+                    visible={visibleTrade}
+                    title="请选择交易方式"
+                    showCancelButton
+                    onConfirm={() => {
+                        Toast.info('点击确认按钮');
+                        setVisibleTrade(false);
+                        setVisiblePayment(true); // 显示支付方式选择框
+                    }}
+                    onCancel={() => setVisibleTrade(false)}
+                >
+                    <div >
+                        <Flex justify='center' align='center'>
+                            <Flex.Item span={12} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Button
+                                    type="danger"
+                                    size="medium"
+                                    style={{
+                                        borderRadius: '8px',
+                                        padding: '8px 12px',
+                                    }}
+                                    onClick={() => {
+                                        Toast.success("平台交易");
+                                        setVisibleTrade(false);
+                                        setVisiblePayment(true); // 显示支付方式选择框
+                                    }}
+                                >
+                                    平台交易
+                                </Button>
+                            </Flex.Item>
+                            <Flex.Item span={12} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Button
+                                    type="primary"
+                                    size="medium"
+                                    style={{
+                                        borderRadius: '8px',
+                                        padding: '8px 12px',
+                                    }}
+                                    onClick={() => {
+                                        Toast.success("线下交易");
+                                        setVisibleTrade(false);
+                                        setVisiblePayment(true); // 显示支付方式选择框
+                                    }}
+                                >
+                                    线下交易
+                                </Button>
+                            </Flex.Item>
+                        </Flex>
+                    </div>
+                </Dialog>
+            )}
+
+            {visiblePayment && (
+                <Dialog
+                    visible={visiblePayment}
+                    title="请选择支付方式"
+                >
+                    <div>
+                        <div style={{ textAlign: 'center', fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '10px' }}>
+                            支付金额：<span style={{ color: '#ff4d4f' }}>300元</span>
+                        </div>
+                        <div style={{ textAlign: 'center', fontSize: '1rem', color: '#666', marginBottom: '20px' }}>
+                            倒计时：<span id="countdown-timer" style={{ color: '#ff4d4f' }}>30:00</span>
+                        </div>
+                        <Flex justify='center' align='center'>
+                            <Flex.Item span={12} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Button
+                                    type="success"
+                                    size="medium"
+                                    icon={<WechatPay fontSize={"2em"}></WechatPay>}
+                                    onClick={() => handlePaymentChoice('微信')}
+                                >
+                                    微信支付
+                                </Button>
+                            </Flex.Item>
+                            <Flex.Item span={12} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Button
+                                    type="primary"
+                                    size="medium"
+                                    icon={<Alipay fontSize={"2em"}></Alipay>}
+                                    onClick={() => handlePaymentChoice('支付宝')}
+                                >
+                                    支付宝支付
+                                </Button>
+                            </Flex.Item>
+                        </Flex>
+                    </div>
+                </Dialog>
+            )}
+
+            {chatRestrictState === 1 && orderItem && userinfo.id !== orderItem.userId && (
+                <Card
+                    round
+                    style={{
+                        margin: '20px 0',
+                        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                    }}
+                >
+                    <Card.Header
+                        style={{
+                            backgroundColor: '#f5f5f5',
+                            color: '#333',
+                            fontSize: '1.2rem',
+                            fontWeight: 'bold',
+                            textAlign: 'center',
+                            padding: '10px',
+                        }}
+                    >
+                        我的报价
+                    </Card.Header>
                     <Card.Body
                         style={{
                             height: '20vh',
                             display: 'flex',
-                            justifyContent: 'center',
+                            justifyContent: 'space-around',
                             alignItems: 'center',
+                            padding: '10px',
+                            gap: '10px',
                         }}
                     >
-                        <Image src={orderItem.images}></Image>
-                        {orderItem.description}
+                        <Image
+                            src={orderItem.images}
+                            style={{
+                                height: '100px',
+                                width: '100px',
+                                borderRadius: '8px',
+                                objectFit: 'cover',
+                            }}
+                        />
+                        <div
+                            style={{
+                                fontSize: '1rem',
+                                color: '#666',
+                                textAlign: 'justify',
+                            }}
+                        >
+                            {orderItem.description}
+                        </div>
                     </Card.Body>
-                    <Card.Footer>
-                        <div style={{ textAlign: 'center' }}>出价：{quoteAmount}</div>
+                    <Card.Footer
+                        style={{
+                            padding: '10px',
+                            borderTop: '1px solid #eee',
+                            textAlign: 'center',
+                            fontSize: '1.5rem',
+                            fontWeight: 'bold',
+                            color: '#ff4d4f',
+                        }}
+                    >
+                        出价：{quoteAmount}
                     </Card.Footer>
                 </Card>
+            )}
 
-            }
             <div className="chat-content">
                 <div className="message-block" style={{ overflowY: 'auto', flex: 1 }}>
                     {messages !== undefined && messages.length > 0 && messages.map((message, index) => (
-                        <ChatItem key={index} message={message} userinfo={userinfo} />
+                        <ChatItem key={index} message={message} userinfo={userinfo} accptBid={accptBid} refuseBid={refuseBid}
+                            chatRestrictState={chatRestrictState} setChatRestrictState={setChatRestrictState} handleClickTrade={handleClickTrade} />
                     ))}
                     <div ref={messageEndRef} />
                 </div>
             </div>
-            <ChatInput style={{ marginTop: "20px" }} onSend={handleSend} userinfo={userinfo} chatRestrictState={chatRestrictState}
-                setChatRestrictState={setChatRestrictState} orderItem={orderItem} quoteAmount={quoteAmount} setQuoteAmount={setQuoteAmount} />
+            <ChatInput
+                style={{ marginTop: "20px" }}
+                onSend={handleSend}
+                userinfo={userinfo}
+                chatRestrictState={chatRestrictState}
+                setChatRestrictState={setChatRestrictState}
+                orderItem={orderItem}
+                quoteAmount={quoteAmount}
+                setQuoteAmount={setQuoteAmount}
+            />
             {orderItem && orderItem !== '{}' && (
                 <SubmitBar
                     textAlign="left"
@@ -130,7 +373,6 @@ function ChatBox({ boxMessage, setChatState, userinfo, sendMessage, orderItem })
                     onSubmit={() => { handleSend(JSON.stringify(orderItem), "order") }}
                 />
             )}
-
         </div>
     );
 }

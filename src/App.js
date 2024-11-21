@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { HashRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Login from './components/Login.jsx';
 import Home from './components/Home.jsx';
@@ -9,7 +9,6 @@ import ChatBox from './components/ChatBox.jsx';
 import { Toast } from 'react-vant';
 import Chat from "./components/Chat.jsx";
 import Order from "./components/Order.jsx";
-import Profile from './components/Profile.jsx';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -18,6 +17,7 @@ function App() {
     const [orderItem, setOrderItem] = useState({});
     const [initialState, setInitialState] = useState(false);
     const initialStateRef = useRef(initialState); // 使用 ref 存储当前值
+
 
     const [boxMessage, setBoxMessage] = useState([{
         "id": 192,
@@ -132,7 +132,7 @@ function App() {
                     <Route path="/order" element={<Order />} />
                     <Route path="/contact"
                         element={<ChatBox userinfo={userinfo} boxMessage={boxMessage} sendMessage={sendMessage}
-                            orderItem={orderItem} />} />
+                            orderItem={orderItem}  />} />
                 </Routes>
             </Router>
         </div>

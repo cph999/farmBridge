@@ -10,14 +10,13 @@ import Publish from "./Publish.jsx";
 import LocalStorageUtil from "../utils/LocalStorageUtil";
 import { useLocation } from "react-router";
 import AddPost from "./AddPost.jsx";
+import HistoryStatistic from "./HistoryStatistic.jsx";
 
 const Home = ({
     websocket,
     setOrderItem,
     setBoxMessage,
-    boxMessage,
-    chatRestrictState,
-    setChatRestrictState,
+    boxMessage
 }) => {
     const location = useLocation();
     const { item } = location.state || {};
@@ -27,7 +26,7 @@ const Home = ({
         LocalStorageUtil.getItem("userinfo")
     );
 
-    const tabs = ["publish", "trade", "add", "chat", "profile"]; // Tab 顺序
+    const tabs = ["publish", "add", "chat", "profile"]; // Tab 顺序
 
     useEffect(() => {
         if (item) {
@@ -57,15 +56,15 @@ const Home = ({
                     <Publish
                         setOrderItem={setOrderItem}
                         userinfo={userinfo}
+                        setActiveTab={setActiveTab}
                         setBoxMessage={setBoxMessage}
                     />
                 );
             case "trade":
-                return <Trade userinfo={userinfo} />;
+                return <Trade userinfo={userinfo} setActiveTab={setActiveTab} />;
             case "chat":
                 return (
                     <Chat
-                        userinfo={userinfo}
                         websocket={websocket}
                         setBoxMessageApp={setBoxMessage}
                         boxMessageApp={boxMessage}
@@ -75,6 +74,8 @@ const Home = ({
                 return <Profile userinfo={userinfo} setUserinfox={setUserinfo} />;
             case "add":
                 return <AddPost />;
+            case "history":
+                return <HistoryStatistic setActiveTab={setActiveTab} />;
             default:
                 return (
                     <Publish
@@ -102,9 +103,9 @@ const Home = ({
                 <Tabbar.Item icon={<HomeO />} name="publish">
                     首页
                 </Tabbar.Item>
-                <Tabbar.Item icon={<Search />} name="trade" badge={{ dot: true }}>
+                {/* <Tabbar.Item icon={<Search />} name="trade" badge={{ dot: true }}>
                     商城
-                </Tabbar.Item>
+                </Tabbar.Item> */}
                 <Tabbar.Item icon={<AddO />} name="add" badge={{ dot: true }}>
                     发布
                 </Tabbar.Item>

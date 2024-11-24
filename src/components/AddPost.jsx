@@ -37,7 +37,6 @@ const AddPost = () => {
                 body,
             });
             const json = await resp.json();
-            console.log('Upload successful:', json.data.url);
             setImages((imgs) => {
                 if (imgs === "") return json.data.url;
                 else return imgs + "," + json.data.url;

@@ -9,13 +9,20 @@ import ChatBox from './components/ChatBox.jsx';
 import { Toast } from 'react-vant';
 import Chat from "./components/Chat.jsx";
 import Order from "./components/Order.jsx";
-
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(LocalStorageUtil.getItem("userinfo") !== undefined
+        && LocalStorageUtil.getItem("userinfo") !== null);
     const websocketRef = useRef(null);  // 使用 useRef 存储 WebSocket 实例
     const [userinfo, setUserinfo] = useState({});
     const [orderItem, setOrderItem] = useState({});
     const [initialState, setInitialState] = useState(false);
+    const [isHandleLoginSuccess, setIsLoginSuccess] = useState(false);
+
+    useEffect(() => {
+        if (isAuthenticated && !isHandleLoginSuccess) {
+            handleLoginSuccess();
+        }
+    }, [isAuthenticated]);
 
     const [boxMessage, setBoxMessage] = useState([{
         "id": 192,
@@ -32,12 +39,13 @@ function App() {
 
     const handleLoginSuccess = () => {
         const u = LocalStorageUtil.getItem("userinfo");
+        console.log("userinfo ", u)
         setIsAuthenticated(true);
+        setIsLoginSuccess(true);
 
         if (u != null && u !== undefined && JSON.stringify(u) !== '{}') {
             const wsInstance = new WebSocket(`ws://localhost:8809/chat?userId=${u.id}`);
             // const wsInstance = new WebSocket(`wss://app102.acapp.acwing.com.cn/chat?userId=${userinfo.id}`);
-
 
             wsInstance.onopen = () => {
                 console.log('WebSocket connected');
@@ -117,6 +125,7 @@ function App() {
                         }
                     />
                     <Route path="/post-detail" element={<PostDetail />} />
+
                     <Route path="/myself" element={<Home handleLogOut={handleLogOut} userinfo={userinfo} websocket={websocketRef.current}
                         setOrderItem={setOrderItem}
                         setBoxMessage={setBoxMessage} boxMessage={boxMessage} />} />

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import "./Publish.css";
-import { Tabs, Input, Button, Card, Image, Toast, Space, Flex, List, PullRefresh, Swiper } from 'react-vant';
-import { Search, Arrow, PhoneO } from '@react-vant/icons';
-import { useNavigate } from 'react-router-dom';  // 导入 useNavigate
+import './Publish.css';
+import { Tabs, Input, Card, Image, Toast, Space, Flex, List, PullRefresh, Swiper, Button } from 'react-vant';
+import { Search, Arrow, PhoneO, ShoppingCartO, ChartTrendingO } from '@react-vant/icons';
+import { useNavigate } from 'react-router-dom';
 import instance from '../utils/api';
 
-const Publish = ({ boxMessage, setBoxMessage, sendMessage, setOrderItem, userinfo }) => {
-    const navigate = useNavigate();  // 初始化 useNavigate
-    const [tabsList] = useState(["全部", "牛", "羊", "猪", "鸭"]);
-    const [currentTab, setCurrentTab] = useState(0);
+const Publish = ({ boxMessage, setBoxMessage, sendMessage, setOrderItem, userinfo, setActiveTab }) => {
+    const navigate = useNavigate();
+    // const [tabsList] = useState(["全部", "牛", "羊", "猪", "鸭"]);
+    // const [currentTab, setCurrentTab] = useState(0);
     const [search, setSearch] = useState("");
     const [pageNum, setPageNum] = useState(1);
     const [pageSize] = useState(10);
@@ -88,18 +88,18 @@ const Publish = ({ boxMessage, setBoxMessage, sendMessage, setOrderItem, userinf
     }, []);
 
     const queryPost = async (page) => {
-        return await instance.post("/getPostList", { search, categoryCode: currentTab, pageNum: page, pageSize });
+        return await instance.post("/getPostList", { search, categoryCode: 0, pageNum: page, pageSize });
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setList([]);
-            setIsOver(false);
-            setFinished(false);
-            await onLoadRefresh(true);
-        };
-        fetchData();
-    }, [currentTab]);
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         setList([]);
+    //         setIsOver(false);
+    //         setFinished(false);
+    //         await onLoadRefresh(true);
+    //     };
+    //     fetchData();
+    // }, [currentTab]);
 
     const onRefresh = async () => {
         setIsOver(false);
@@ -116,22 +116,20 @@ const Publish = ({ boxMessage, setBoxMessage, sendMessage, setOrderItem, userinf
         await onLoadRefresh(true);
     };
 
-    // 点击卡片跳转
     const handleCardClick = (item) => {
-        navigate('/post-detail', { state: { item } });  // 携带 item 数据
+        navigate('/post-detail', { state: { item } });
     };
 
     const handleContractClick = async (item) => {
         setOrderItem(item);
-        console.log("item", item)
         instance.post('/messagesByDialog', {
             fromId: userinfo.id,
             toId: item.userId
         }).then(res => {
             setBoxMessage(res.data.datas[0]);
-        })
-        navigate('/contact', { state: { item } });  // 携带 item 数据
-    }
+        });
+        navigate('/contact', { state: { item } });
+    };
 
     return (
         <div className='publish-container'>
@@ -143,20 +141,46 @@ const Publish = ({ boxMessage, setBoxMessage, sendMessage, setOrderItem, userinf
                     suffix={<Search fontSize="2em" onClick={handleSearch} />}
                     placeholder="搜索您感兴趣的品类"
                 />
-                <Tabs onChange={(e) => {
-                    setCurrentTab(e);
-                    setPageNum(1);
-                }}>
-                    {tabsList.map((item, index) => (
-                        <Tabs.TabPane key={index} title={item} />
-                    ))}
-                </Tabs>
             </div>
 
             <div className='body-container'>
                 <div className="swiper-container">
-                    <Swiper autoplay={5000} loop={true}>{items}</Swiper>
+                    <Swiper
+                        autoplay={3000}
+                        loop={true}
+                        indicatorColor="white"
+                        style={{
+                            width: '100%',
+                            height: '300px', // 轮播图高度
+                        }}
+                    >
+                        {items}
+                    </Swiper>
                 </div>
+
+                <div className="cards-container">
+                    <Card className="card shop-card">
+                        <Card.Header
+                            icon={<ShoppingCartO />}
+                            title="商城"
+                        />
+                        <Card.Body onClick={() => { setActiveTab("trade") }}>
+                            商城 <ShoppingCartO />
+                        </Card.Body>
+                    </Card>
+                    <Card className="card trade-card">
+                        <Card.Header
+                            icon={<ChartTrendingO />}
+                            title="历史交易均价"
+                        />
+                        <Card.Body onClick={() => { setActiveTab("history") }}>
+                            历史交易均价 <ChartTrendingO />
+                        </Card.Body>
+                    </Card>
+                </div>
+
+
+                <h5 className="section-title">今日精选</h5>
                 <PullRefresh onRefresh={onRefresh} style={{ marginTop: '10px' }}>
                     <List finished={finished} onLoad={() => onLoadRefresh(false)}>
                         <Flex wrap="wrap" gutter={20}>
@@ -169,14 +193,8 @@ const Publish = ({ boxMessage, setBoxMessage, sendMessage, setOrderItem, userinf
                                                 style={{ width: '100%', height: '15vh', objectFit: 'cover' }}
                                             />
                                         </Card.Cover>
-                                        <Card.Header
-                                            extra={<Arrow />}
-                                        >
-                                            {item.description}
-                                        </Card.Header>
-                                        <Card.Body>
-                                            {item.locationInfo}
-                                        </Card.Body>
+                                        <Card.Header extra={<Arrow />}>{item.description}</Card.Header>
+                                        <Card.Body>{item.locationInfo}</Card.Body>
                                         <Card.Footer>
                                             <Space>
                                                 <Button
@@ -184,7 +202,7 @@ const Publish = ({ boxMessage, setBoxMessage, sendMessage, setOrderItem, userinf
                                                     round
                                                     color='linear-gradient(to right, #ff6034, #ee0a24)'
                                                     size='small'
-                                                    onClick={() => handleContractClick(item)}  // 使用箭头函数传递 item
+                                                    onClick={() => handleContractClick(item)}
                                                 >
                                                     在线联系
                                                 </Button>

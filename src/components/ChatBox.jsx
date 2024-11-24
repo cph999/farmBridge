@@ -6,8 +6,9 @@ import ChatInput from './ChatInput.jsx';
 import './ChatBox.css';
 import instance from "../utils/api.js";
 import { WechatPay, Alipay } from '@react-vant/icons';
+import LocalStorageUtil from "../utils/LocalStorageUtil.js";
 
-function ChatBox({ boxMessage, setChatState, userinfo, sendMessage, orderItem }) {
+function ChatBox({ boxMessage, setChatState, sendMessage, orderItem }) {
     const navigate = useNavigate();
     const [quoteAmount, setQuoteAmount] = useState('');
     const [visibleTrade, setVisibleTrade] = useState(false);
@@ -15,9 +16,12 @@ function ChatBox({ boxMessage, setChatState, userinfo, sendMessage, orderItem })
     const [selectedPayment, setSelectedPayment] = useState(''); // 存储选中的支付方式
     const [tradeStateMessage, setTradeStateMessage] = useState({});
     const [chatRestrictState, setChatRestrictState] = useState(1);
+
+    const [userinfo, setUserinfo] = useState(
+        LocalStorageUtil.getItem("userinfo")
+    );
     // 接受报价
     const accptBid = (message) => {
-        console.log('accptBid message:', message);
         if (userinfo.id === message.fromId) {
             Toast.fail('无法处理自己的报价');
             return;
@@ -62,12 +66,17 @@ function ChatBox({ boxMessage, setChatState, userinfo, sendMessage, orderItem })
 
     const handleClickTrade = (m) => {
         if (m.toId === userinfo.id) {
-            setTradeStateMessage(m);
+            console.log("tradeStateMessage", m);
+            const messageObj = JSON.parse(m.message);
+            messageObj.chatRestrictState = 5;
+            const updatedM = { ...m, message: JSON.stringify(messageObj) };
+            setTradeStateMessage(updatedM);
             setVisibleTrade(true);
         } else {
             Toast.fail('无法处理自己的报价');
         }
-    }
+    };
+
 
     const [messages, setMessages] = useState(boxMessage);
 
@@ -160,7 +169,6 @@ function ChatBox({ boxMessage, setChatState, userinfo, sendMessage, orderItem })
             const safePrevMessages = Array.isArray(prevMessages) ? prevMessages : [];
             return [...safePrevMessages, newMessageObject];
         });
-
         sendMessage(newMessageObject);
     };
 

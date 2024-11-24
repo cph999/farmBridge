@@ -1,0 +1,53 @@
+.history-statistic {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+.statistic-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.statistic-table th,
+.statistic-table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+.statistic-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.statistic-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.statistic-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.statistic-table td {
+    color: #666;
+}
+
+.statistic-table td,
+.statistic-table th {
+    min-width: 120px;
+}
+
+.statistic-table td {
+    font-size: 16px;
+}

@@ -6,8 +6,9 @@ import './Chat.css';
 import defaultIcon from '../assets/icon.png';
 import ChatBox from './ChatBox.jsx';
 import { AddO } from '@react-vant/icons';
+import LocalStorageUtil from '../utils/LocalStorageUtil.js';
 
-function Chat({ userinfo, websocket, setBoxMessageApp, boxMessageApp }) {
+function Chat({ websocket, setBoxMessageApp, boxMessageApp }) {
     const [messages, setMessages] = useState([]); // 所有消息
     const [finish, setFinish] = useState(false);
     const [boxMessage, setBoxMessage] = useState([]); // 当前对话人的消息
@@ -16,6 +17,9 @@ function Chat({ userinfo, websocket, setBoxMessageApp, boxMessageApp }) {
     const [addFriendState, setAddFriendState] = useState(false);
     const [userList, setUserList] = useState([]);
     const [search, setSearch] = useState('');
+    const [userinfo, setUserinfo] = useState(
+        LocalStorageUtil.getItem("userinfo")
+    );
     const [addFriendText, setAddFriendText] = useState('添加好友');
     // 1: 只能购买人报价，也就是不是发布人
     // 发布人只能接受或者拒绝报价
@@ -78,7 +82,6 @@ function Chat({ userinfo, websocket, setBoxMessageApp, boxMessageApp }) {
                                 const targetId = currentBoxMessage[0].fromId === userinfo.id ? currentBoxMessage[0].toId : currentBoxMessage[0].fromId;
                                 if (newMessage.fromId === targetId || newMessage.toId === targetId) {
                                     setBoxMessage(updatedMessages[i]);
-                                    console.log("updatedMessages", updatedMessages[i])
                                 }
                             }
                             flag = true;
@@ -100,7 +103,9 @@ function Chat({ userinfo, websocket, setBoxMessageApp, boxMessageApp }) {
     }, [userinfo, websocket]);
 
     const sendMessage = (message) => {
+        console.log("message", message)
         if (websocket && websocket.readyState === WebSocket.OPEN) {
+            console.log("userinfo31", userinfo)
             websocket.send(JSON.stringify(message));
         } else {
             Toast.fail('WebSocket未连接');

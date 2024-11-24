@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import "./Trade.css";
 import instance from "../utils/api";
-import { List, Cell, PullRefresh } from 'react-vant';
+import { List, Cell, PullRefresh, NavBar } from 'react-vant';
 import { useNavigate } from 'react-router-dom';  // 导入 useNavigate
 
-const Trade = () => {
+const Trade = ({ setActiveTab }) => {
     const [commodities, setCommodities] = useState([]);
     const [finished, setFinished] = useState(false);  // 是否加载完所有商品
     const [pageNum, setPageNum] = useState(1);  // 当前页码
@@ -70,6 +70,11 @@ const Trade = () => {
 
     return (
         <div className="trade-container">
+            <NavBar
+                leftText="返回"
+                onClickLeft={() => { setActiveTab("publish") }}
+            />
+
             <PullRefresh onRefresh={onRefresh} style={{ marginTop: '10px' }}>
                 <List finished={finished} onLoad={onLoad} loading={loading}>
                     <div className="commodity-list">

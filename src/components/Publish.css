@@ -1,87 +1,143 @@
 /* Publish.css */
+
+/* 主容器 */
 .publish-container {
     display: flex;
     flex-direction: column;
     height: 100%;
-}
-
-.header-container {
     padding: 10px;
-    font-size: "2em";
     background-color: #f8f9fa;
 }
 
-.vant-tabs__nav {
-    display: flex;
-    justify-content: space-around;
-    padding: 10px 0;
-    border-bottom: 1px solid #e5e5e5;
+/* 搜索框容器 */
+.header-container {
+    padding: 10px;
+    font-size: 1.2em;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
 }
 
-.vant-tabs__nav-item {
-    font-size: 16px;
-    padding: 10px 15px;
-    color: #666;
-    cursor: pointer;
-    transition: color 0.3s, background-color 0.3s;
-}
-
-.vant-tabs__nav-item--active {
-    font-weight: bold;
-    color: #008c8c;
-    /* 选中的标签颜色 */
-    background: linear-gradient(to right, #a2facf, #64acff);
-    border-radius: 20px;
-    padding: 10px 20px;
-}
-
-.vant-tabs__nav-item:hover {
-    color: #008c8c;
-    /* 鼠标悬停时标签的颜色 */
-}
-
-.body-container {
-    padding: 20px;
-    flex: 1;
-    background-color: #fff;
-    margin-bottom: 10%;
-}
-
-
+/* 轮播图容器 */
 .swiper-container {
-    .rv-swiper {
-        &__slide {
-            .rv-swiper-item {
-                color: #fff;
-                font-size: 20px;
-                height: 150px;
-                text-align: center;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
+    width: 100%;
+    height: 300px;
+    /* 轮播图高度 */
+    overflow: hidden;
+    margin-bottom: 20px;
+}
 
-            &:nth-child(odd) {
-                .rv-swiper-item {
-                    background-color: #3f45ff;
-                }
-            }
+.swiper-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* 图片适配容器 */
+    display: block;
+    background-color: #f0f0f0;
+}
 
-            &:nth-child(even) {
-                .rv-swiper-item {
-                    background-color: lighten(#3f45ff, 8%);
-                }
-            }
-        }
+/* 卡片区域 */
+.cards-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    /* 卡片之间的间距 */
+    margin: 20px 0;
+}
 
-        img {
-            display: block;
-            box-sizing: border-box;
-            width: 100%;
-            height: 240px;
-            padding: 30px 60px;
-            background-color: #fff;
-            pointer-events: none;
-        }
-    }
+.card {
+    flex: 1;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/* 卡片悬停效果 */
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 不同卡片的背景渐变 */
+.shop-card {
+    background: linear-gradient(135deg, #ffe29f, #ffa99f);
+}
+
+.trade-card {
+    background: linear-gradient(135deg, #89f7fe, #66a6ff);
+}
+
+/* 卡片内容 */
+.card .rv-card__header,
+.card .rv-card__body {
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+    padding: 15px;
+}
+
+/* 卡片标题 */
+.card .rv-card__header {
+    font-size: 1.2em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* 卡片悬停文本颜色变化 */
+.card:hover .rv-card__header,
+.card:hover .rv-card__body {
+    color: #000;
+}
+
+/* 今日精选标题 */
+.section-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* 下拉刷新区域 */
+.body-container {
+    flex: 1;
+    padding: 20px 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: auto;
+}
+
+/* 列表卡片样式 */
+.item-box .rv-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/* 列表卡片悬停效果 */
+.item-box .rv-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.item-box .rv-card__cover img {
+    width: 100%;
+    height: 15vh;
+    object-fit: cover;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* 列表卡片底部按钮 */
+.item-box .rv-card__footer .rv-button {
+    background: linear-gradient(to right, #ff6034, #ee0a24);
+    color: #fff;
+    border-radius: 20px;
+    font-size: 0.9em;
+    transition: background 0.3s;
+}
+
+.item-box .rv-card__footer .rv-button:hover {
+    background: linear-gradient(to right, #ee0a24, #ff6034);
 }

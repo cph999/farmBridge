@@ -66,7 +66,6 @@ function ChatBox({ boxMessage, setChatState, sendMessage, orderItem }) {
 
     const handleClickTrade = (m) => {
         if (m.toId === userinfo.id) {
-            console.log("tradeStateMessage", m);
             const messageObj = JSON.parse(m.message);
             messageObj.chatRestrictState = 5;
             const updatedM = { ...m, message: JSON.stringify(messageObj) };

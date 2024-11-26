@@ -5,6 +5,7 @@ import LocalStorageUtil from './LocalStorageUtil';
 // 创建一个 axios 实例
 export const instance = axios.create({
     baseURL: 'http://localhost:8809/api',  // 或者你可以切换到 https://app102.acapp.acwing.com.cn/api
+    // baseURL: 'https://app102.acapp.acwing.com.cn/api',
     headers: {
         'Content-Type': 'application/json',
     }

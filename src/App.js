@@ -39,7 +39,6 @@ function App() {
 
     const handleLoginSuccess = () => {
         const u = LocalStorageUtil.getItem("userinfo");
-        console.log("userinfo ", u)
         setIsAuthenticated(true);
         setIsLoginSuccess(true);
 

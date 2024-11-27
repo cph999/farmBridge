@@ -142,7 +142,9 @@
     background-color: transparent;
 }
 
-.rv-input input::placeholder {
-    color: #000;
-    opacity: 1;
+.publish-container{
+    .rv-input input::placeholder {
+        color: #000;
+        opacity: 1;
+    }
 }

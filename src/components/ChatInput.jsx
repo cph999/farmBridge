@@ -147,9 +147,9 @@ function ChatInput({ onSend, userinfo, chatRestrictState, setChatRestrictState, 
                     发送
                 </Button>
             )}
+
             {chatRestrictState === 1 && orderItem && userinfo.id !== orderItem.userId && (
                 <div>
-                    123123
                     <NumberKeyboard
                         title="报价"
                         extraKey="."

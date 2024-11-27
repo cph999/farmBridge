@@ -1,47 +1,60 @@
-.add-post-container {
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    max-width: 600px;
-    height: 100vh;
-    margin: 0 auto;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
 .add-post-title {
-    text-align: center;
     font-size: 24px;
-    margin-bottom: 20px;
+    font-weight: bold;
     color: #333;
-}
-
-.add-post-uploader {
     margin-bottom: 20px;
-    border: 1px dashed #d9d9d9;
-    border-radius: 8px;
-    padding: 20px;
-    background-color: #fff;
 }
 
-.add-post-inputs {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    align-items: center;
+.vant-form-item {
+    margin-bottom: 16px;
 }
 
-.add-post-title-input,
-.add-post-textarea {
-    width: 100%;
-    max-width: 500px;
-    padding: 12px;
+.vant-form-item-label {
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #fff;
-    box-sizing: border-box;
+    color: #333;
+    min-width: 120px;
+    margin-right: 12px;
 }
 
-.add-post-textarea {
-    resize: none;
+.vant-input, .vant-textarea {
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    border: 1px solid #dcdfe6;
+    background-color: #fff;
+    width: 100%;
+}
+
+.vant-input:focus, .vant-textarea:focus {
+    border-color: #4fc3f7;
+    outline: none;
+}
+
+.vant-uploader {
+    margin-top: 12px;
+}
+
+.vant-uploader .van-uploader__wrapper {
+    padding: 10px;
+    background-color: #f4f4f4;
+    border-radius: 6px;
+    border: 1px dashed #dcdfe6;
+}
+
+.vant-button {
+    font-size: 16px;
+    border-radius: 6px;
+    padding: 12px;
+    background-color: #4fc3f7;
+    color: white;
+    border: none;
+}
+
+.vant-button:disabled {
+    background-color: #dcdfe6;
+    color: #999;
+}
+
+.vant-button:active {
+    background-color: #3884e6;
 }

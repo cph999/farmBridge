@@ -73,7 +73,7 @@ const Home = ({
             case "profile":
                 return <Profile userinfo={userinfo} setUserinfox={setUserinfo}/>;
             case "add":
-                return <AddPost/>;
+                return <AddPost setActiveTab={setActiveTab}/>;
             case "history":
                 return <HistoryStatistic setActiveTab={setActiveTab}/>;
             default:
@@ -107,7 +107,7 @@ const Home = ({
                     发布
                 </Tabbar.Item>
                 <Tabbar.Item icon={<FriendsO/>} name="chat" badge={{content: 5}}>
-                    聊天
+                    消息
                 </Tabbar.Item>
                 <Tabbar.Item icon={<SettingO/>} name="profile">
                     我的

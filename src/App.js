@@ -43,8 +43,8 @@ function App() {
         setIsLoginSuccess(true);
 
         if (u != null && u !== undefined && JSON.stringify(u) !== '{}') {
-            const wsInstance = new WebSocket(`ws://localhost:8809/chat?userId=${u.id}`);
-            // const wsInstance = new WebSocket(`wss://app102.acapp.acwing.com.cn/chat?userId=${userinfo.id}`);
+            // const wsInstance = new WebSocket(`ws://localhost:8809/chat?userId=${u.id}`);
+            const wsInstance = new WebSocket(`wss://app102.acapp.acwing.com.cn/chat?userId=${userinfo.id}`);
 
             wsInstance.onopen = () => {
                 console.log('WebSocket connected');

@@ -103,9 +103,7 @@ function Chat({ websocket, setBoxMessageApp, boxMessageApp }) {
     }, [userinfo, websocket]);
 
     const sendMessage = (message) => {
-        console.log("message", message)
         if (websocket && websocket.readyState === WebSocket.OPEN) {
-            console.log("userinfo31", userinfo)
             websocket.send(JSON.stringify(message));
         } else {
             Toast.fail('WebSocket未连接');
@@ -197,14 +195,14 @@ function Chat({ websocket, setBoxMessageApp, boxMessageApp }) {
                             <Flex.Item span={8} className="nickname-container">
                                 <span className="nickname">{userinfo.nickname}</span>
                             </Flex.Item>
-                            <Flex.Item span={12} style={{ textAlign: 'right', marginTop: '15px' }}>
-                                <Popover
-                                    actions={disabledActions}
-                                    onSelect={select}
-                                    placement="bottom-end"
-                                    reference={<AddO fontSize="1.5em" />}
-                                />
-                            </Flex.Item>
+                            {/*<Flex.Item span={12} style={{ textAlign: 'right', marginTop: '15px' }}>*/}
+                            {/*    <Popover*/}
+                            {/*        actions={disabledActions}*/}
+                            {/*        onSelect={select}*/}
+                            {/*        placement="bottom-end"*/}
+                            {/*        reference={<AddO fontSize="1.5em" />}*/}
+                            {/*    />*/}
+                            {/*</Flex.Item>*/}
                         </Flex>
                     </div>
 
@@ -215,7 +213,7 @@ function Chat({ websocket, setBoxMessageApp, boxMessageApp }) {
                                     <Cell
                                         key={message[message.length - 1].id}
                                         title={userinfo.id === message[message.length - 1].fromId ? message[message.length - 1].toNickname : message[message.length - 1].fromNickname}
-                                        label={message[message.length - 1].message}
+                                        label={message[message.length - 1].type==="str"?message[message.length - 1].message:"你有一条新的报价消息，请火速查看!"}
                                         icon={<img
                                             src={userinfo.id === message[message.length - 1].fromId ? message[message.length - 1].toIcon : message[message.length - 1].fromIcon}
                                             alt="from" className="cell-icon" />}
